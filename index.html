@@ -193,6 +193,7 @@
                 <thead>
                     <tr>
                         <th data-lan="thClient">Client Details</th>
+                        <th data-lan="phone">Phone Num</th>
                         <th data-lan="location">Location</th>
                         <th data-lan="thDate">Issue Date</th>
                         <th class="text-right" data-lan="thAmount">Total Amount</th>
@@ -457,15 +458,16 @@
                 // 1. Desktop Output Grid (Collapsible)
                 tbody.innerHTML += `
                     <tr class="desktop-row-clickable ${strikeClass}" onclick="toggleRowAccordion(${idx}, 'desktop')">
-                        <td><strong class="strike-target" style="font-size:0.95rem; color:#0f172a;">${translateDataValue(row["Client"])}</strong><br><small>${lang.mob}: ${row["Phone Num"] || '-'}</small></td>
-                        <td><span class="strike-target">${translateDataValue(row["Location"])}</span></td>
-                        <td><span class="strike-target">${row["Issue_date"] || '-'}</span></td>
+                        <td><strong class="strike-target" style="font-size:0.95rem; color:#0f172a;">${translateDataValue(row["Client"])}</strong></td>
+                        <td><span class="strike-target font-mono" style="font-size:0.85rem; color:#475569;">${row["Phone Num"] || '-'}</span></td>
+                        <td>${translateDataValue(row["Location"])}</td>
+                        <td>${row["Issue_date"] || '-'}</td>
                         <td class="text-right font-mono strike-target">${formatRupee(amount)}</td>
                         <td class="text-right font-mono strike-target" style="color:#059669;">${formatRupee(interest)}</td>
                         <td class="text-center"><span class="pill ${isInactive ? 'pill-overdue':'pill-completed'}">${translateDataValue(statusStr)}</span></td>
                         <td class="text-center"><a class="action-link edit-link" onclick="initiateRowEdit(${idx}, event)">${lang.edit}</a></td>
                     </tr>
-                    <tr id="desktop-details-${idx}" class="expandable-detail-row"><td colspan="7">
+                    <tr id="desktop-details-${idx}" class="expandable-detail-row"><td colspan="8">
                         <div class="details-wrapper">
                             <div class="details-block-col">
                                 <h4>${lang.mgmtBreakdown}</h4>
@@ -475,6 +477,7 @@
                             </div>
                             <div class="details-block-col">
                                 <h4>${lang.dealParam}</h4>
+                                • ${lang.client} ${lang.phone}: ${row["Phone Num"] || '-'}<br>
                                 • ${lang.date}: ${row["Issue_date"] || '-'}<br>
                                 • Interest Rate: ${row["interest rate"] || 0}%<br>
                                 • ${lang.payout}: ${translateDataValue(row["payout type"])}<br>
