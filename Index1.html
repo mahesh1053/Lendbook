@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Ledger Dashboard</title>
+    <script src="https://tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cloudflare.com">
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 antialiased">
+
+    <!-- Setup Overlay Screen (Hidden by Default) -->
+    <div id="setup-screen" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 border border-gray-100">
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                    <i class="fa-solid fa-link"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900">Connect Your Sheet</h2>
+                <p class="text-xs text-gray-500">Paste your Google Sheets Published CSV link below to sync your dashboard data securely on this device.</p>
+            </div>
+            <div class="space-y-3">
+                <input type="url" id="setup-url-input" placeholder="https://google.com" 
+                    class="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                <button onclick="saveCustomLink()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium text-sm transition-all shadow-sm shadow-indigo-200">
+                    Connect & Launch Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <nav class="bg-indigo-600 text-white shadow-md px-4 sm:px-6 py-4 flex justify-between items-center sticky top-0 z-40">
+        <div class="flex items-center space-x-2.5">
+            <i class="fa-solid fa-chart-pie text-xl text-indigo-200"></i>
+            <h1 class="text-lg font-bold tracking-wide">Shop Ledger</h1>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="clearSavedLink()" title="Change Sheet Link" class="p-2 text-indigo-200 hover:text-white rounded-lg hover:bg-indigo-700 text-xs transition-all">
+                <i class="fa-solid fa-gear text-base"></i>
+            </button>
+            <span id="sync-status" class="text-xs bg-indigo-700 px-2.5 py-1 rounded-md border border-indigo-500 font-medium">
+                Loading...
+            </span>
+        </div>
+    </nav>
+
+    <!-- Main Content Wrapper -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Metrics Cards Grid -->
+        <section class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total Given</p>
+                    <h3 id="metric-given" class="text-lg sm:text-2xl font-bold text-gray-900 mt-0.5">$0.00</h3>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Received</p>
+                    <h3 id="metric-received" class="text-lg sm:text-2xl font-bold text-gray-900 mt-0.5">$0.00</h3>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Pending</p>
+                    <h3 id="metric-pending" class="text-lg sm:text-2xl font-bold text-amber-600 mt-0.5">$0.00</h3>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Shops</p>
+                    <h3 id="metric-shops" class="text-lg sm:text-2xl font-bold text-purple-900 mt-0.5">0</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Bar -->
+        <section class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex gap-3 items-center">
+            <div class="relative flex-1">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 text-xs">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" id="search-input" placeholder="Search shop name..." 
+                    class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm">
+            </div>
+            <button id="refresh-btn" class="p-2 text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all text-sm flex items-center justify-center w-10 h-10">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+        </section>
+
+        <!-- Table Container -->
+        <section class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100 text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                            <th class="px-6 py-4">Shop Name</th>
+                            <th class="px-6 py-4">Date</th>
+                            <th class="px-6 py-4 text-right">Given</th>
+                            <th class="px-6 py-4 text-right">Received</th>
+                            <th class="px-6 py-4 text-right">Pending Balance</th>
+                            <th class="px-6 py-4 text-center">Status</th>
+                            <th class="px-6 py-4">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="divide-y divide-gray-100 text-sm text-gray-700"></tbody>
+                </table>
+            </div>
+            <div id="mobile-list" class="block md:hidden divide-y divide-gray-100"></div>
+        </section>
+    </main>
+
+    <script>
+        // 1. HARDCODE YOUR PERMANENT URL LINK HERE
+        const HARDCODED_URL = 'https://google.com';
+
+        let rawLedgerData = [];
+
+        // 2. FIXED LOGIC: Auto-inject the hardcoded URL if the mobile browser has nothing stored
+        function checkAndForceUrl() {
+            const savedUrl = localStorage.getItem('user_sheet_csv_url');
+            if (!savedUrl || savedUrl.trim() === "" || savedUrl.includes("https://docs.google.com/spreadsheets/d/e/2PACX-1vSdlco1RbLt9TnSPpATWQ1ZdTz2p1Uk3zSM3MVgekyoMOSn2gcwQRAAYDEJQ9yWJqtorfLbxTWNEmyv/pub?output=csv")) {
+                localStorage.setItem('user_sheet_csv_url', HARDCODED_URL);
+            }
+        }
+
+        async function fetchSheetData() {
+            checkAndForceUrl(); // Run the safety inject rule first
+            const currentUrl = localStorage.getItem('user_sheet_csv_url');
+            const statusEl = document.getElementById('sync-status');
+            
+            try {
+                statusEl.innerText = "Syncing...";
+                statusEl.className = "text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md font-bold animate-pulse";
+                
+                const response = await fetch(currentUrl + '&t=' + new Date().getTime()); // Breaks CDN cache
+                if (!response.ok) throw new Error("Fetch error.");
+                const data = await response.text();
+                
+                rawLedgerData = parseCSV(data);
+                renderDashboard(rawLedgerData);
+                
+                statusEl.innerText = "Connected";
+                statusEl.className = "text-xs bg-emerald-500 text-white px-2 py-0.5 rounded-md";
+            } catch (error) {
+                console.error(error);
+                statusEl.innerText = "Sync Failed";
+                statusEl.className = "text-xs bg-rose-500 text-white px-2 py-0.5 rounded-md";
+                document.getElementById('setup-screen').classList.remove('hidden'); // Only show setup screen if the hardcoded link breaks completely
+            }
+        }
+
+        function saveCustomLink() {
+            const val = document.getElementById('setup-url-input').value.trim();
+            if(val) {
+                localStorage.setItem('user_sheet_csv_url', val);
+                document.getElementById('setup-screen').classList.add('hidden');
+                fetchSheetData();
+            }
+        }
+
+        function clearSavedLink() {
+            if(confirm("Change dashboard connection link source?")) {
+                localStorage.removeItem('user_sheet_csv_url');
+                document.getElementById('setup-url-input').value = HARDCODED_URL;
+                document.getElementById('setup-screen').classList.remove('hidden');
+            }
+        }
+
+        function parseCSV(csvText) {
+            const lines = csvText.split(/\r?\n/);
+            if (lines.length < 2) return [];
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            return lines.slice(1).map(line => {
+                const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
+                const values = matches.map(v => v.trim().replace(/^"|"$|^'|'$/g, ''));
+                let obj = {};
+                headers.forEach((header, index) => { obj[header] = values[index] || ""; });
+                return obj;
+            }).filter(item => item["Shop Name"]);
+        }
+
+        function renderDashboard(data) {
+            let totalGiven = 0, totalReceived = 0;
+            let distinctShops = new Set();
+            const tbody = document.getElementById('table-body');
+            const mList = document.getElementById('mobile-list');
+            tbody.innerHTML = ""; mList.innerHTML = "";
+
+            data.forEach(row => {
+                const given = parseFloat(row["Amount Given"]) || 0;
+                const received = parseFloat(row["Amount Received"]) || 0;
+                const pending = given - received; 
+                totalGiven += given; totalReceived += received;
+                if(row["Shop Name"]) distinctShops.add(row["Shop Name"]);
+
+                let statusClass = "bg-gray-100 text-gray-700";
+                const statusTxt = (row["Status"] || '').trim().toLowerCase();
+                if (statusTxt === 'paid' || statusTxt === 'completed') statusClass = "bg-emerald-100 text-emerald-800";
+                else if (statusTxt === 'pending' || statusTxt === 'partial') statusClass = "bg-amber-100 text-amber-800";
+                else if (statusTxt === 'overdue') statusClass = "bg-rose-100 text-rose-800";
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50/50 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-6 py-3.5 font-bold text-gray-900">${row["Shop Name"]}</td>
+                    <td class="px-6 py-3.5 text-gray-500 whitespace-nowrap text-xs">${row["Date"] || '-'}</td>
+                    <td class="px-6 py-3.5 text-right font-mono">${formatCurrency(given)}</td>
+                    <td class="px-6 py-3.5 text-right font-mono text-emerald-600">${formatCurrency(received)}</td>
+                    <td class="px-6 py-3.5 text-right font-mono font-bold ${pending > 0 ? 'text-amber-600' : 'text-gray-900'}">${formatCurrency(pending)}</td>
+                    <td class="px-6 py-3.5 text-center whitespace-nowrap"><span class="px-2.5 py-0.5 text-xs font-semibold rounded-full ${statusClass}">${row["Status"] || 'Unknown'}</span></td>
+                    <td class="px-6 py-3.5 text-gray-500 max-w-xs truncate text-xs">${row["Notes"] || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+
+                const mCard = document.createElement('div');
+                mCard.className = "p-4 space-y-3 bg-white border-b border-gray-100";
+                mCard.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-base">${row["Shop Name"]}</h4>
+                            <span class="text-[11px] text-gray-400"><i class="fa-regular fa-calendar mr-1"></i>${row["Date"] || 'No Date'}</span>
+                        </div>
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${statusClass}">${row["Status"] || 'Unknown'}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 pt-1 text-center font-mono">
+                        <div class="text-left"><span class="text-[9px] uppercase tracking-tight text-gray-400 block font-sans">Given</span><span class="text-xs text-gray-700 font-semibold">${formatCurrency(given)}</span></div>
+                        <div><span class="text-[9px] uppercase tracking-tight text-gray-400 block font-sans">Received</span><span class="text-xs text-emerald-600 font-semibold">${formatCurrency(received)}</span></div>
+                        <div class="text-right"><span class="text-[9px] uppercase tracking-tight text-gray-400 block font-sans">Pending</span><span class="text-xs font-bold ${pending > 0 ? 'text-amber-600' : 'text-gray-900'}">${formatCurrency(pending)}</span></div>
+                    </div>
+                `;
+                mList.appendChild(mCard);
+            });
+
+            document.getElementById('metric-given').innerText = formatCurrency(totalGiven);
+            document.getElementById('metric-received').innerText = formatCurrency(totalReceived);
+            document.getElementById('metric-pending').innerText = formatCurrency(totalGiven - totalReceived);
+            document.getElementById('metric-shops').innerText = distinctShops.size;
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+        }
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            const filtered = rawLedgerData.filter(row => (row["Shop Name"] || '').toLowerCase().includes(searchTerm));
+            renderDashboard(filtered);
+        });
+
+        document.getElementById('refresh-btn').addEventListener('click', fetchSheetData);
+        window.addEventListener('DOMContentLoaded', fetchSheetData);
+    </script>
+</body>
+</html>
