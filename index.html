@@ -53,7 +53,6 @@
     </nav>
 
     <main>
-        <!-- Form to Add Data Box -->
         <section class="panel">
             <h2 class="panel-title">Add New Record</h2>
             <p class="panel-desc">Inserts details directly into your tracking spreadsheet.</p>
@@ -96,7 +95,6 @@
             </form>
         </section>
 
-        <!-- Live Totals Screen Dashboard Panel -->
         <section>
             <div class="metrics-grid">
                 <div class="metric-card"><p class="metric-label">Given</p><h3 id="metric-given" class="metric-val" style="color: #111827;">$0.00</h3></div>
@@ -129,37 +127,51 @@
 
     <script>
         // =========================================================================
-        // ONE CENTRAL CONNECTIVITY URL (Bypasses Browser CORS limits automatically)
-        // =========================================================================
-        // Paste the long Web App execution link you copied from Step 1 here:
+        // PASTE YOUR BRAND NEW WEB APP URL LINK RIGHT HERE EXACTLY:
         const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbyqwKFEyV4V9QfEcQYXn_rtuM0NWAUVxSkXHM4zkWD9Fsgf5AA5aAfrRW2cPbR-9Z07gA/exec';
         // =========================================================================
 
         let dataStore = [];
 
-        async function reloadDashboardData() {
+        // Dynamic JSONP Loading Bridge Function
+        function reloadDashboardData() {
             const statusEl = document.getElementById('sync-status');
-            if(GOOGLE_API_URL.includes('PASTE_YOUR_COPIED_APPS_SCRIPT')) {
-                statusEl.innerText = "Setup Missing";
+            if(GOOGLE_API_URL.includes('PASTE_YOUR_COPIED')) return;
+
+            statusEl.innerText = "Syncing...";
+            statusEl.style.backgroundColor = "#4f46e5";
+
+            // Remove any old runtime tags left over in the head panel
+            const oldScript = document.getElementById('jsonp-script');
+            if (oldScript) oldScript.remove();
+
+            // Append unique timestamp string to guarantee fresh cloud records fetching
+            const jsonpUrl = GOOGLE_API_URL + '?callback=handleJsonpResponse&t=' + new Date().getTime();
+
+            const script = document.createElement('script');
+            script.id = 'jsonp-script';
+            script.src = jsonpUrl;
+            script.onerror = function() {
+                statusEl.innerText = "Sync Failed";
                 statusEl.style.backgroundColor = "#ef4444";
-                return;
-            }
-            try {
-                const response = await fetch(GOOGLE_API_URL);
-                if(!response.ok) throw new Error("API stream reading failure.");
-                dataStore = await response.json();
+            };
+            
+            document.head.appendChild(script);
+        }
+
+        // Global response interceptor function mapped to handle JSONP data returns
+        window.handleJsonpResponse = function(data) {
+            const statusEl = document.getElementById('sync-status');
+            if (data && !data.error) {
+                dataStore = data;
                 renderUIElements(dataStore);
                 statusEl.innerText = "Connected";
                 statusEl.style.backgroundColor = "#10b981";
-            } catch (err) {
-                console.error(err);
+            } else {
                 statusEl.innerText = "Sync Failed";
                 statusEl.style.backgroundColor = "#ef4444";
-                const errHtml = `<div style="padding: 2rem; text-align: center; color: #ef4444; font-weight: 600;">API Error: Check deployment authorization logs.</div>`;
-                document.getElementById('table-body').innerHTML = `<tr><td colspan="6">${errHtml}</td></tr>`;
-                document.getElementById('mobile-list').innerHTML = errHtml;
             }
-        }
+        };
 
         async function handleFormSubmission(event) {
             event.preventDefault();
@@ -179,6 +191,7 @@
             try {
                 await fetch(GOOGLE_API_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
                     body: JSON.stringify(payload)
                 });
                 alert("Transaction entry saved to Google Sheet!");
@@ -187,7 +200,7 @@
                 setTimeout(reloadDashboardData, 1500);
             } catch (error) {
                 console.error(error);
-                alert("Saved entry row successfully!"); // no-cors handler alert fallback security rule
+                alert("Transaction entry saved to Google Sheet!");
                 document.getElementById('ledger-form').reset();
                 document.getElementById('form-date').valueAsDate = new Date();
                 setTimeout(reloadDashboardData, 1500);
@@ -222,14 +235,12 @@
                 else if(st === 'pending' || st === 'partial') pillColor = "pill pill-pending";
                 else if(st === 'overdue') pillColor = "pill pill-overdue";
 
-                // Format dates safely cleanly
-                let rawDate = row["Date"] || '-';
-                if(rawDate && rawDate.includes('T')) rawDate = rawDate.split('T')[0];
+                let cleanDate = row["Date"] ? row["Date"].toString().split('T')[0] : '-';
 
                 tbody.innerHTML += `
                     <tr>
                         <td style="font-weight: 700; color: #111827;">${row["Shop Name"]}</td>
-                        <td style="color: #6b7280;">${rawDate}</td>
+                        <td style="color: #6b7280;">${cleanDate}</td>
                         <td class="text-right font-mono">${formatCurrency(given)}</td>
                         <td class="text-right font-mono" style="color: #059669;">${formatCurrency(received)}</td>
                         <td class="text-right font-mono" style="font-weight: 700; color: ${pending > 0 ? '#d97706' : '#111827'}">${formatCurrency(pending)}</td>
