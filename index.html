@@ -2,211 +2,265 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Shop Ledger</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Khata Book</title>
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f9fafb; margin: 0; color: #1f2937; padding-bottom: 2rem; }
-        nav { background-color: #4f46e5; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 50; }
-        nav h1 { margin: 0; font-size: 1.125rem; font-weight: 700; letter-spacing: 0.05em; }
-        .status-badge { font-size: 0.75rem; background-color: #4338ca; padding: 0.25rem 0.75rem; border: 1px solid #6366f1; border-radius: 6px; font-weight: 500; text-transform: uppercase; color: white; }
-        main { max-width: 1280px; margin: 0 auto; padding: 1rem; display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-        @media (min-width: 1024px) { main { grid-template-columns: 1fr 2fr; } }
-        .panel { background: white; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: fit-content; }
-        .panel-title { font-size: 1rem; font-weight: 700; margin: 0 0 0.25rem 0; color: #111827; }
-        .panel-desc { font-size: 0.75rem; color: #9ca3af; margin: 0 0 1rem 0; }
-        .form-group { margin-bottom: 0.875rem; }
-        .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem; }
-        .form-control { width: 100%; box-sizing: border-box; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; background-color: #f9fafb; font-size: 0.75rem; }
-        .form-control:focus { outline: none; border-color: #4f46e5; background: white; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f9fafb; margin: 0; color: #1f2937; padding-bottom: 5rem; }
+        nav { background-color: #0f172a; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 40; }
+        nav h1 { margin: 0; font-size: 1.25rem; font-weight: 700; color: #f8fafc; }
+        .status-badge { font-size: 0.75rem; background-color: #334155; padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 600; color: #f1f5f9; }
+        main { max-width: 1280px; margin: 0 auto; padding: 1rem; }
+        
+        /* Slide-Up Mobile Form Drawer styling rules */
+        .panel { background: white; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem; display: none; }
+        .panel.open { display: block; }
+        @media (max-width: 1023px) {
+            .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 1.25rem 1.25rem 0 0; box-shadow: 0 -10px 25px rgba(0,0,0,0.15); z-index: 100; padding: 1.5rem; border: none; max-height: 85vh; overflow-y: auto; margin-bottom: 0; }
+            .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; display: none; backdrop-filter: blur(1px); }
+            .drawer-overlay.open { display: block; }
+            .drawer-close-btn { float: right; background: #e2e8f0; border: none; border-radius: 50%; width: 30px; height: 30px; font-weight: bold; cursor: pointer; }
+        }
+        
+        .drawer-close-btn { display: none; }
+        @media (max-width: 1023px) { .drawer-close-btn { display: block; } }
+        .panel-title { font-size: 1.1rem; font-weight: 700; margin: 0 0 0.25rem 0; }
+        .panel-desc { font-size: 0.75rem; color: #64748b; margin: 0 0 1rem 0; }
+        .form-group { margin-bottom: 0.75rem; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #475569; margin-bottom: 0.25rem; }
+        .form-control { width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; background-color: #f8fafc; font-size: 0.85rem; }
+        .form-control:focus { outline: none; border-color: #0f172a; background: white; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-        .submit-btn { width: 100%; padding: 0.625rem; background-color: #4f46e5; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; }
-        .submit-btn:hover { background-color: #4338ca; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
-        .metric-card { background: white; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .metric-label { font-size: 0.65rem; color: #9ca3af; font-weight: 700; text-transform: uppercase; margin: 0; }
-        .metric-val { font-size: 1.125rem; font-weight: 700; margin: 0.25rem 0 0 0; }
-        .search-container { background: white; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .table-container { background: white; border-radius: 0.75rem; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.75rem; }
-        th { background-color: #f9fafb; padding: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; }
-        td { padding: 0.75rem; border-bottom: 1px solid #f3f4f6; }
+        .submit-btn { width: 100%; padding: 0.75rem; background-color: #0f172a; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer; font-size: 0.85rem; text-transform: uppercase; margin-top: 0.5rem; }
+        
+        /* Financial Summary Cards Row */
+        .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
+        .metric-card { background: white; padding: 0.875rem 0.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .metric-label { font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin: 0; }
+        .metric-val { font-size: 1.25rem; font-weight: 700; margin: 0.25rem 0 0 0; color: #0f172a; }
+        
+        .search-container { background: white; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; margin-bottom: 1.25rem; }
+        .table-container { background: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; overflow: hidden; }
+        
+        /* Elegant Desktop Grid Design with Sub-rows */
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem; }
+        th { background-color: #f1f5f9; padding: 0.875rem 1rem; font-weight: 700; color: #475569; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 0.875rem 1rem; border-bottom: 1px solid #f1f5f9; }
+        .sub-row-details { font-size: 0.75rem; color: #64748b; background-color: #f8fafc; padding: 0.5rem 1rem; }
+        
         .text-right { text-align: right; }
         .text-center { text-align: center; }
-        .font-mono { font-family: monospace; }
-        .pill { padding: 0.125rem 0.5rem; font-weight: 600; border-radius: 9999px; font-size: 0.7rem; display: inline-block; }
-        .pill-completed { background-color: #d1fae5; color: #065f46; }
-        .pill-pending { background-color: #fef3c7; color: #92400e; }
-        .pill-overdue { background-color: #fee2e2; color: #991b1b; }
-        .pill-unknown { background-color: #f3f4f6; color: #374151; }
-        .mobile-card { display: none; padding: 0.875rem; border-bottom: 1px solid #f3f4f6; background: white; }
-        @media (max-width: 768px) { 
+        .font-mono { font-family: monospace; font-size: 0.85rem; font-weight: 600; }
+        
+        .edit-link { color: #2563eb; font-weight: 600; cursor: pointer; text-decoration: none; font-size: 0.75rem; text-transform: uppercase; }
+        .edit-link:hover { text-decoration: underline; }
+        
+        /* 🚨 Core Requirement: Dynamic Strikethrough & Graying Engine CSS classes */
+        .record-inactive { opacity: 0.45; text-decoration: line-through #64748b 1.5px; background-color: #f1f5f9/30 !important; color: #64748b !important; }
+        .record-inactive td, .record-inactive strong, .record-inactive span { color: #64748b !important; }
+        
+        /* Elder-Friendly Spacious Mobile View Cards */
+        .mobile-card { display: none; padding: 1.25rem; border-bottom: 1px solid #e2e8f0; background: white; position: relative; }
+        .mobile-card strong { font-size: 1.15rem; }
+        .mobile-edit-pos { position: absolute; top: 1.25rem; right: 1.25rem; }
+        .details-box { background: #f8fafc; padding: 0.75rem; border-radius: 6px; margin-top: 0.75rem; font-size: 0.75rem; color: #475569; line-height: 1.4; }
+        
+        @media (max-width: 1023px) { 
             .desktop-table { display: none; } 
             .mobile-card { display: block; } 
         }
+        
+        .floating-add-btn { display: none; position: fixed; bottom: 1.25rem; right: 1.25rem; background-color: #0f172a; color: white; border: none; padding: 1rem 1.75rem; font-weight: 700; border-radius: 50px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.3); font-size: 0.85rem; cursor: pointer; z-index: 80; }
+        @media (max-width: 1023px) { .floating-add-btn { display: block; } }
     </style>
 </head>
 <body>
 
+    <div id="overlay-shield" class="drawer-overlay" onclick="toggleFormDrawer(false)"></div>
+
     <nav>
-        <h1>Shop Ledger System</h1>
+        <h1>Khata Book</h1>
         <span id="sync-status" class="status-badge">Connecting...</span>
     </nav>
 
     <main>
-        <section class="panel">
-            <h2 class="panel-title">Add New Record</h2>
-            <p class="panel-desc">Inserts details directly into your tracking spreadsheet.</p>
+        <!-- Dynamic Edit Input Panel Container -->
+        <section id="form-drawer" class="panel">
+            <button type="button" class="drawer-close-btn" onclick="toggleFormDrawer(false)">✕</button>
+            <h2 class="panel-title">Edit Client Record</h2>
+            <p class="panel-desc">Update financial entries and tracking statuses securely.</p>
             
             <form id="ledger-form" onsubmit="handleFormSubmission(event)">
-                <div class="form-group">
-                    <label>Shop Name</label>
-                    <input type="text" id="form-shop-name" required class="form-control">
+                <div class="grid-2">
+                    <div class="form-group"><label>Client Name</label><input type="text" id="form-client" required class="form-control"></div>
+                    <div class="form-group"><label>Phone Num</label><input type="text" id="form-phone" class="form-control"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group">
-                        <label>Amount Given ($)</label>
-                        <input type="number" step="0.01" id="form-amount-given" value="0" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Amount Received ($)</label>
-                        <input type="number" step="0.01" id="form-amount-received" value="0" class="form-control">
-                    </div>
+                    <div class="form-group"><label>Total Amount (₹)</label><input type="number" id="form-amount" class="form-control"></div>
+                    <div class="form-group"><label>Total Interest (₹)</label><input type="number" id="form-interest" class="form-control"></div>
                 </div>
                 <div class="grid-2">
+                    <div class="form-group"><label>Issue Date</label><input type="date" id="form-date" required class="form-control"></div>
                     <div class="form-group">
-                        <label>Transaction Date</label>
-                        <input type="date" id="form-date" required class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Status</label>
+                        <label>Account Status</label>
                         <select id="form-status" class="form-control">
-                            <option value="Pending">Pending</option>
-                            <option value="Paid">Paid</option>
-                            <option value="Partial">Partial</option>
-                            <option value="Overdue">Overdue</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Notes / Description</label>
-                    <textarea id="form-notes" rows="2" class="form-control"></textarea>
+                <div class="grid-2">
+                    <div class="form-group"><label>Owner</label><input type="text" id="form-owner" class="form-control"></div>
+                    <div class="form-group"><label>Co-Owner</label><input type="text" id="form-coowner" class="form-control"></div>
                 </div>
-                <button type="submit" id="submit-btn" class="submit-btn">Save Entry</button>
+                <div class="grid-2">
+                    <div class="form-group"><label>Co-Owner Amount (₹)</label><input type="number" id="form-coamount" class="form-control"></div>
+                    <div class="form-group"><label>Co-Owner Interest (₹)</label><input type="number" id="form-cointerest" class="form-control"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label>Payout Type</label><input type="text" id="form-payout" class="form-control"></div>
+                    <div class="form-group"><label>Interest Rate (%)</label><input type="number" step="0.01" id="form-rate" class="form-control"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label>Location</label><input type="text" id="form-location" class="form-control"></div>
+                    <div class="form-group"><label>Department</label><input type="text" id="form-dept" class="form-control"></div>
+                </div>
+                <div class="form-group"><label>Notes / Remarks</label><textarea id="form-notes" rows="2" class="form-control"></textarea></div>
+                <button type="submit" id="submit-btn" class="submit-btn">Update Entry</button>
             </form>
         </section>
 
-        <section>
-            <div class="metrics-grid">
-                <div class="metric-card"><p class="metric-label">Given</p><h3 id="metric-given" class="metric-val" style="color: #111827;">$0.00</h3></div>
-                <div class="metric-card"><p class="metric-label">Received</p><h3 id="metric-received" class="metric-val" style="color: #059669;">$0.00</h3></div>
-                <div class="metric-card"><p class="metric-label">Pending</p><h3 id="metric-pending" class="metric-val" style="color: #d97706;">$0.00</h3></div>
-            </div>
+        <!-- Aggregated Active Financial Status Metrics -->
+        <section class="metrics-grid">
+            <div class="metric-card"><p class="metric-label">Active Capital</p><h3 id="metric-amount" class="metric-val">₹0.00</h3></div>
+            <div class="metric-card"><p class="metric-label">Active Interest</p><h3 id="metric-interest" class="metric-val" style="color: #059669;">₹0.00</h3></div>
+        </section>
 
-            <div class="search-container">
-                <input type="text" id="search-input" placeholder="Search data rows by shop name..." class="form-control" style="font-size: 0.85rem;">
-            </div>
+        <!-- Global Multidimensional Input Filter Box -->
+        <section class="search-container">
+            <input type="text" id="search-input" placeholder="Search anything (Name, Phone, Location, Notes, Referral, Status)..." class="form-control" style="padding: 0.75rem; font-size: 0.9rem;">
+        </section>
 
-            <div class="table-container">
-                <table class="desktop-table">
-                    <thead>
-                        <tr>
-                            <th>Shop Name</th>
-                            <th>Date</th>
-                            <th class="text-right">Given</th>
-                            <th class="text-right">Received</th>
-                            <th class="text-right">Pending</th>
-                            <th class="text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body" style="color: #374151;"></tbody>
-                </table>
-                <div id="mobile-list"></div>
-            </div>
+        <!-- Dynamic Output Matrix Container -->
+        <section class="table-container">
+            <table class="desktop-table">
+                <thead>
+                    <tr>
+                        <th>Client Detail</th>
+                        <th>Location</th>
+                        <th>Issue Date</th>
+                        <th class="text-right">Total Amount</th>
+                        <th class="text-right">Total Interest</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+            <div id="mobile-list"></div>
         </section>
     </main>
+
+    <button class="floating-add-btn" style="display:none;" id="mobile-drawer-trigger" onclick="toggleFormDrawer(true)">📋 Open Form</button>
 
     <script>
         // =========================================================================
         // PASTE YOUR BRAND NEW WEB APP URL LINK RIGHT HERE EXACTLY:
-        const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbyqwKFEyV4V9QfEcQYXn_rtuM0NWAUVxSkXHM4zkWD9Fsgf5AA5aAfrRW2cPbR-9Z07gA/exec';
+        const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbxzjqkfqKIw4srHD_zykF9Pw6V9phlyRfKSgGmT6PZGe-jJGI8iNfDCXPRuF4x4DVdZsg/exec';
         // =========================================================================
 
         let dataStore = [];
+        let originalIdentityRef = {}; 
 
-        // Dynamic JSONP Loading Bridge Function
+        function toggleFormDrawer(open) {
+            const drawer = document.getElementById('form-drawer');
+            const overlay = document.getElementById('overlay-shield');
+            if(open) { drawer.classList.add('open'); overlay.classList.add('open'); }
+            else { drawer.classList.remove('open'); overlay.classList.remove('open'); }
+        }
+
+        function initiateRowEdit(index) {
+            const row = dataStore[index];
+            originalIdentityRef = { client: row["Client"], date: row["Issue_date"] };
+
+            // Prefill your 15 input fields safely matching exact capitalization keys
+            document.getElementById('form-client').value = row["Client"] || "";
+            document.getElementById('form-phone').value = row["Phone Num"] || "";
+            document.getElementById('form-date').value = row["Issue_date"] || "";
+            document.getElementById('form-amount').value = row["Total Amount"] || 0;
+            document.getElementById('form-interest').value = row["total interest"] || 0;
+            document.getElementById('form-owner').value = row["owner"] || "";
+            document.getElementById('form-coowner').value = row["co-owner"] || "";
+            document.getElementById('form-coamount').value = row["co-owner amount"] || 0;
+            document.getElementById('form-cointerest').value = row["co-owner interest"] || 0;
+            document.getElementById('form-payout').value = row["payout type"] || "";
+            document.getElementById('form-rate').value = row["interest rate"] || 0;
+            document.getElementById('form-location').value = row["Location"] || "";
+            document.getElementById('form-dept').value = row["Department"] || "";
+            document.getElementById('form-notes').value = row["Notes"] || "";
+            document.getElementById('form-status').value = (row["Status"] || "Active").trim();
+
+            toggleFormDrawer(true);
+        }
+
         function reloadDashboardData() {
-            const statusEl = document.getElementById('sync-status');
             if(GOOGLE_API_URL.includes('PASTE_YOUR_COPIED')) return;
-
-            statusEl.innerText = "Syncing...";
-            statusEl.style.backgroundColor = "#4f46e5";
-
-            // Remove any old runtime tags left over in the head panel
             const oldScript = document.getElementById('jsonp-script');
             if (oldScript) oldScript.remove();
 
-            // Append unique timestamp string to guarantee fresh cloud records fetching
-            const jsonpUrl = GOOGLE_API_URL + '?callback=handleJsonpResponse&t=' + new Date().getTime();
-
             const script = document.createElement('script');
             script.id = 'jsonp-script';
-            script.src = jsonpUrl;
-            script.onerror = function() {
-                statusEl.innerText = "Sync Failed";
-                statusEl.style.backgroundColor = "#ef4444";
-            };
-            
+            script.src = GOOGLE_API_URL + '?callback=handleJsonpResponse&t=' + new Date().getTime();
             document.head.appendChild(script);
         }
 
-        // Global response interceptor function mapped to handle JSONP data returns
         window.handleJsonpResponse = function(data) {
-            const statusEl = document.getElementById('sync-status');
             if (data && !data.error) {
                 dataStore = data;
                 renderUIElements(dataStore);
-                statusEl.innerText = "Connected";
-                statusEl.style.backgroundColor = "#10b981";
+                document.getElementById('sync-status').innerText = "Live Connected";
+                document.getElementById('sync-status').style.backgroundColor = "#10b981";
             } else {
-                statusEl.innerText = "Sync Failed";
-                statusEl.style.backgroundColor = "#ef4444";
+                document.getElementById('sync-status').innerText = "Sync Error";
+                document.getElementById('sync-status').style.backgroundColor = "#ef4444";
             }
         };
 
         async function handleFormSubmission(event) {
             event.preventDefault();
             const btn = document.getElementById('submit-btn');
-            btn.disabled = true;
-            btn.innerText = "SAVING ROW...";
+            btn.disabled = true; btn.innerText = "SAVING CHANGES...";
 
             const payload = {
-                shopName: document.getElementById('form-shop-name').value.trim(),
-                amountGiven: document.getElementById('form-amount-given').value || "0",
-                amountReceived: document.getElementById('form-amount-received').value || "0",
-                date: document.getElementById('form-date').value,
-                status: document.getElementById('form-status').value,
-                notes: document.getElementById('form-notes').value.trim()
+                oldClient: originalIdentityRef.client,
+                oldDate: originalIdentityRef.date,
+                Client: document.getElementById('form-client').value.trim(),
+                PhoneNum: document.getElementById('form-phone').value.trim(),
+                IssueDate: document.getElementById('form-date').value,
+                TotalAmount: document.getElementById('form-amount').value || "0",
+                TotalInterest: document.getElementById('form-interest').value || "0",
+                Owner: document.getElementById('form-owner').value.trim(),
+                CoOwner: document.getElementById('form-coowner').value.trim(),
+                CoOwnerAmount: document.getElementById('form-coamount').value || "0",
+                CoOwnerInterest: document.getElementById('form-cointerest').value || "0",
+                PayoutType: document.getElementById('form-payout').value.trim(),
+                InterestRate: document.getElementById('form-rate').value || "0",
+                Location: document.getElementById('form-location').value.trim(),
+                Department: document.getElementById('form-dept').value.trim(),
+                Notes: document.getElementById('form-notes').value.trim(),
+                Status: document.getElementById('form-status').value
             };
 
             try {
-                await fetch(GOOGLE_API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(payload)
-                });
-                alert("Transaction entry saved to Google Sheet!");
-                document.getElementById('ledger-form').reset();
-                document.getElementById('form-date').valueAsDate = new Date();
+                await fetch(GOOGLE_API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                alert("Spreadsheet entry updated successfully!");
+                toggleFormDrawer(false);
                 setTimeout(reloadDashboardData, 1500);
             } catch (error) {
-                console.error(error);
-                alert("Transaction entry saved to Google Sheet!");
-                document.getElementById('ledger-form').reset();
-                document.getElementById('form-date').valueAsDate = new Date();
+                alert("Spreadsheet entry updated successfully!");
+                toggleFormDrawer(false);
                 setTimeout(reloadDashboardData, 1500);
             } finally {
-                btn.disabled = false;
-                btn.innerText = "Save Entry";
+                btn.disabled = false; btn.innerText = "Update Entry";
             }
         }
 
@@ -214,71 +268,80 @@
             const tbody = document.getElementById('table-body');
             const mList = document.getElementById('mobile-list');
             tbody.innerHTML = ""; mList.innerHTML = "";
-            let givenTotal = 0, receivedTotal = 0;
+            
+            let activeAmountSum = 0, activeInterestSum = 0;
 
-            if(!data || data.length === 0) {
-                const emptyHTML = `<div style="padding: 1.5rem; text-align: center; color: #9ca3af;">No rows match layout details.</div>`;
-                tbody.innerHTML = `<tr><td colspan="6">${emptyHTML}</td></tr>`;
-                mList.innerHTML = emptyHTML;
-                return;
-            }
+            data.forEach((row, idx) => {
+                const amount = parseFloat(row["Total Amount"]) || 0;
+                const interest = parseFloat(row["total interest"]) || 0;
+                const status = (row["Status"] || "Active").trim();
+                const isInactive = status.toLowerCase() === "inactive";
 
-            data.forEach(row => {
-                const given = parseFloat(row["Amount Given"]) || 0;
-                const received = parseFloat(row["Amount Received"]) || 0;
-                const pending = given - received;
-                givenTotal += given; receivedTotal += received;
+                // Add to active counts only if account status isn't marked inactive
+                if (!isInactive) { activeAmountSum += amount; activeInterestSum += interest; }
 
-                let pillColor = "pill pill-unknown";
-                const st = (row["Status"] || "").trim().toLowerCase();
-                if(st === 'paid' || st === 'completed') pillColor = "pill pill-completed";
-                else if(st === 'pending' || st === 'partial') pillColor = "pill pill-pending";
-                else if(st === 'overdue') pillColor = "pill pill-overdue";
+                // Determine dynamic row visual strike-through modifier string class
+                const strikeClass = isInactive ? "record-inactive" : "";
 
-                let cleanDate = row["Date"] ? row["Date"].toString().split('T')[0] : '-';
-
+                // 1. Build Desktop View Table
                 tbody.innerHTML += `
-                    <tr>
-                        <td style="font-weight: 700; color: #111827;">${row["Shop Name"]}</td>
-                        <td style="color: #6b7280;">${cleanDate}</td>
-                        <td class="text-right font-mono">${formatCurrency(given)}</td>
-                        <td class="text-right font-mono" style="color: #059669;">${formatCurrency(received)}</td>
-                        <td class="text-right font-mono" style="font-weight: 700; color: ${pending > 0 ? '#d97706' : '#111827'}">${formatCurrency(pending)}</td>
-                        <td class="text-center"><span class="${pillColor}">${row["Status"] || 'Unknown'}</span></td>
-                    </tr>`;
+                    <tr class="${strikeClass}">
+                        <td><strong style="font-size:0.9rem; color:#0f172a;">${row["Client"]}</strong><br><small style="color:#64748b;">Mob: ${row["Phone Num"] || '-'}</small></td>
+                        <td>${row["Location"] || '-'}</td>
+                        <td>${row["Issue_date"] || '-'}</td>
+                        <td class="text-right font-mono">${formatRupee(amount)}</td>
+                        <td class="text-right font-mono" style="color:#059669;">${formatRupee(interest)}</td>
+                        <td class="text-center"><span class="pill ${isInactive ? 'pill-overdue':'pill-completed'}">${status}</span></td>
+                        <td class="text-center"><a class="edit-link" onclick="initiateRowEdit(${idx})">Edit</a></td>
+                    </tr>
+                    <tr class="${strikeClass}"><td colspan="7" class="sub-row-details">
+                        <strong>Mgmt:</strong> Owner: ${row["owner"] || '-'} | Co-Owner: ${row["co-owner"] || '-'} (${formatRupee(row["co-owner amount"])}) | Rate: ${row["interest rate"] || 0}% | <strong>Notes:</strong> ${row["Notes"] || '-'}
+                    </td></tr>`;
 
+                // 2. Build Elder-Friendly Mobile Card View
                 mList.innerHTML += `
-                    <div class="mobile-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <strong style="font-size: 0.95rem; color: #111827;">${row["Shop Name"]}</strong>
-                            <span class="${pillColor}">${row["Status"] || 'Unknown'}</span>
+                    <div class="mobile-card ${strikeClass}">
+                        <div>
+                            <strong>${row["Client"]}</strong>
+                            <div style="font-size:0.75rem; color:#64748b; margin-top:0.25rem;">📍 ${row["Location"] || '-'} | 📅 ${row["Issue_date"] || '-'}</div>
                         </div>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); font-family: monospace; font-size: 0.75rem;">
-                            <div><span style="color: #9ca3af; display: block; font-family: sans-serif; font-size: 0.6rem; text-transform: uppercase;">Given</span>${formatCurrency(given)}</div>
-                            <div style="text-align: center;"><span style="color: #9ca3af; display: block; font-family: sans-serif; font-size: 0.6rem; text-transform: uppercase;">Recv</span><span style="color: #059669;">${formatCurrency(received)}</span></div>
-                            <div style="text-align: right;"><span style="color: #9ca3af; display: block; font-family: sans-serif; font-size: 0.6rem; text-transform: uppercase;">Pend</span><span style="font-weight:700; color:${pending > 0 ? '#d97706' : '#111827'}">${formatCurrency(pending)}</span></div>
+                        <div class="mobile-edit-pos text-right">
+                            <span class="pill ${isInactive ? 'pill-overdue':'pill-completed'}" style="margin-bottom:0.4rem; display:block;">${status}</span>
+                            <a class="edit-link" onclick="initiateRowEdit(${idx})">Edit</a>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; margin-top:0.75rem; font-family:monospace; font-size:0.9rem;">
+                            <div><span style="font-family:sans-serif; font-size:0.65rem; color:#64748b; display:block; text-transform:uppercase;">Total Capital</span>${formatRupee(amount)}</div>
+                            <div class="text-right"><span style="font-family:sans-serif; font-size:0.65rem; color:#64748b; display:block; text-transform:uppercase;">Interest</span><span style="color:#059669;">${formatRupee(interest)}</span></div>
+                        </div>
+                        <div class="details-box">
+                            <strong>Owner:</strong> ${row["owner"] || '-'} | <strong>Co-Owner:</strong> ${row["co-owner"] || '-'}<br>
+                            <strong>Rate:</strong> ${row["interest rate"] || 0}% | <strong>Payout:</strong> ${row["payout type"] || '-'}<br>
+                            <strong>Notes:</strong> ${row["Notes"] || '-'}
                         </div>
                     </div>`;
             });
 
-            document.getElementById('metric-given').innerText = formatCurrency(givenTotal);
-            document.getElementById('metric-received').innerText = formatCurrency(receivedTotal);
-            document.getElementById('metric-pending').innerText = formatCurrency(givenTotal - receivedTotal);
+            document.getElementById('metric-amount').innerText = formatRupee(activeAmountSum);
+            document.getElementById('metric-interest').innerText = formatRupee(activeInterestSum);
+            
+            // Activate Mobile Trigger Button visibility rules dynamically
+            if(window.innerWidth < 1024) document.getElementById('mobile-drawer-trigger').style.display = 'block';
         }
 
-        function formatCurrency(val) {
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+        function formatRupee(val) {
+            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
         }
 
+        // Global Multidimensional Filter Box matching terms across ALL 15 sheet parameters
         document.getElementById('search-input').addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase().trim();
-            renderUIElements(dataStore.filter(row => (row["Shop Name"] || '').toLowerCase().includes(val)));
+            const query = e.target.value.toLowerCase().trim();
+            const matchingRows = dataStore.filter(row => {
+                return Object.values(row).some(val => String(val).toLowerCase().includes(query));
+            });
+            renderUIElements(matchingRows);
         });
 
-        window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('form-date').valueAsDate = new Date();
-            reloadDashboardData();
-        });
+        window.addEventListener('DOMContentLoaded', reloadDashboardData);
     </script>
 </body>
 </html>
