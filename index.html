@@ -8,7 +8,12 @@
         body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; margin: 0; color: #1e293b; padding-bottom: 6rem; }
         nav { background-color: #0f172a; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 40; }
         nav h1 { margin: 0; font-size: 1.25rem; font-weight: 700; color: #f8fafc; }
+        
+        /* Language Toggle Button Component styling rules */
+        .lang-toggle-btn { background-color: #3b82f6; color: white; border: none; padding: 0.4rem 0.8rem; font-weight: 700; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: background 0.15s ease; }
+        .lang-toggle-btn:hover { background-color: #2563eb; }
         .status-badge { font-size: 0.75rem; background-color: #334155; padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 600; color: #f1f5f9; }
+        
         main { max-width: 1280px; margin: 0 auto; padding: 1rem; }
         
         /* Slide-Up Mobile Form Drawer Panel Styling */
@@ -97,8 +102,12 @@
     <div id="overlay-shield" class="drawer-overlay" onclick="toggleFormDrawer(false)"></div>
 
     <nav>
-        <h1>Khata Book</h1>
-        <span id="sync-status" class="status-badge">Connecting...</span>
+        <h1 id="nav-title">Khata Book</h1>
+        <div>
+            <!-- One-tap Language Change Button -->
+            <button id="lang-btn" class="lang-toggle-btn" onclick="toggleInterfaceLanguage()">తెలుగు</button>
+            <span id="sync-status" class="status-badge">Connecting...</span>
+        </div>
     </nav>
 
     <main>
@@ -110,17 +119,17 @@
             
             <form id="ledger-form" onsubmit="handleFormSubmission(event)">
                 <div class="grid-2">
-                    <div class="form-group"><label>Client Name</label><input type="text" id="form-client" class="form-control"></div>
-                    <div class="form-group"><label>Phone Num</label><input type="text" id="form-phone" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-client">Client Name</label><input type="text" id="form-client" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-phone">Phone Num</label><input type="text" id="form-phone" class="form-control"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label>Total Amount (₹)</label><input type="number" id="form-amount" class="form-control"></div>
-                    <div class="form-group"><label>Total Interest (₹)</label><input type="number" id="form-interest" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-amount">Total Amount (₹)</label><input type="number" id="form-amount" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-interest">Total Interest (₹)</label><input type="number" id="form-interest" class="form-control"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label>Issue Date</label><input type="date" id="form-date" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-date">Issue Date</label><input type="date" id="form-date" class="form-control"></div>
                     <div class="form-group">
-                        <label>status</label>
+                        <label id="lbl-status">status</label>
                         <select id="form-status" class="form-control">
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
@@ -128,47 +137,47 @@
                     </div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label>owner</label><input type="text" id="form-owner" class="form-control"></div>
-                    <div class="form-group"><label>co-owner</label><input type="text" id="form-coowner" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-owner">owner</label><input type="text" id="form-owner" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-coowner">co-owner</label><input type="text" id="form-coowner" class="form-control"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label>co-owner amount (₹)</label><input type="number" id="form-coamount" class="form-control"></div>
-                    <div class="form-group"><label>co-owner interest (₹)</label><input type="number" id="form-cointerest" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-coamount">co-owner amount (₹)</label><input type="number" id="form-coamount" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-cointerest">co-owner interest (₹)</label><input type="number" id="form-cointerest" class="form-control"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label>payout type</label><input type="text" id="form-payout" class="form-control"></div>
-                    <div class="form-group"><label>interest rate (%)</label><input type="number" step="0.01" id="form-rate" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-payout">payout type</label><input type="text" id="form-payout" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-rate">interest rate (%)</label><input type="number" step="0.01" id="form-rate" class="form-control"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label>Location</label><input type="text" id="form-location" class="form-control"></div>
-                    <div class="form-group"><label>Department</label><input type="text" id="form-dept" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-location">Location</label><input type="text" id="form-location" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-dept">Department</label><input type="text" id="form-dept" class="form-control"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label>Referal</label><input type="text" id="form-referral" class="form-control"></div>
-                    <div class="form-group"><label>Dealt by</label><input type="text" id="form-dealtby" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-referral">Referal</label><input type="text" id="form-referral" class="form-control"></div>
+                    <div class="form-group"><label id="lbl-dealtby">Dealt by</label><input type="text" id="form-dealtby" class="form-control"></div>
                 </div>
-                <div class="form-group"><label>Notes / Remarks</label><textarea id="form-notes" rows="2" class="form-control"></textarea></div>
+                <div class="form-group"><label id="lbl-notes">Notes / Remarks</label><textarea id="form-notes" rows="2" class="form-control"></textarea></div>
                 <button type="submit" id="submit-btn" class="submit-btn">Save Entry</button>
             </form>
         </section>
 
-        <!-- Dynamic Group Total Metrics Cards (Renamed to Total) -->
+        <!-- Dynamic Group Total Metrics Cards (Active Only Calculation Rules) -->
         <section class="metrics-grid">
-            <div class="metric-card"><p class="metric-label">Total Capital</p><h3 id="metric-amount" class="metric-val">₹0</h3></div>
-            <div class="metric-card"><p class="metric-label">Total Interest</p><h3 id="metric-interest" class="metric-val" style="color: #059669;">₹0</h3></div>
-            <div class="metric-card"><p class="metric-label">Total Clients</p><h3 id="metric-clients" class="metric-val" style="color: #2563eb;">0</h3></div>
+            <div class="metric-card"><p id="card-lbl-amount" class="metric-label">Active Capital</p><h3 id="metric-amount" class="metric-val">₹0</h3></div>
+            <div class="metric-card"><p id="card-lbl-interest" class="metric-label">Active Interest</p><h3 id="metric-interest" class="metric-val" style="color: #059669;">₹0</h3></div>
+            <div class="metric-card"><p id="card-lbl-clients" class="metric-label">Active Clients</p><h3 id="metric-clients" class="metric-val" style="color: #2563eb;">0</h3></div>
         </section>
 
         <!-- Global Multi-Column Filter Field Block -->
         <section class="search-container">
-            <input type="text" id="search-input" placeholder="Search anything (Name, Phone, Location, Notes, Referral, Status)..." class="form-control" style="padding: 0.75rem; font-size: 0.9rem;">
+            <input type="text" id="search-input" placeholder="Search anything (Name, Phone, Location, Notes)..." class="form-control" style="padding: 0.75rem; font-size: 0.9rem;">
         </section>
 
         <!-- Ledger Master Matrix Views Area -->
         <section class="table-container">
             <table class="desktop-table">
                 <thead>
-                    <tr>
+                    <tr id="table-header-row">
                         <th>Client Details</th>
                         <th>Location</th>
                         <th>Issue Date</th>
@@ -186,19 +195,123 @@
 
     <!-- Bottom Actions Control Bar for Mobile View Screens -->
     <div class="button-bar">
-        <button class="bar-btn btn-refresh" onclick="reloadDashboardData()">🔄 Refresh</button>
-        <button class="bar-btn btn-add" onclick="openCreateDrawer()">➕ Add New</button>
+        <button id="btn-bar-refresh" class="bar-btn btn-refresh" onclick="reloadDashboardData()">🔄 Refresh</button>
+        <button id="btn-bar-add" class="bar-btn btn-add" onclick="openCreateDrawer()">➕ Add New</button>
     </div>
 
     <script>
         // =========================================================================
         // PASTE YOUR BRAND NEW WEB APP URL LINK RIGHT HERE EXACTLY:
-        const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbwV3BKEGFCHXv6TCJ2IvcNWnSMbETQjzdXCD5zPXNMbN4HWYAYCB7DqXoI2CTE67yWHpg/exec';
+        const GOOGLE_API_URL = 'PASTE_YOUR_COPIED_APPS_SCRIPT_WEB_APP_URL_HERE';
         // =========================================================================
 
         let dataStore = [];
         let isEditMode = false;
+        let currentLanguage = 'en'; // Tracks current translation matrix: 'en' or 'te'
         let originalIdentityRef = {}; 
+
+        // Comprehensive English -> Telugu Interface Translation Dictionary Matrix
+        const dictionary = {
+            en: {
+                title: "Khata Book", connect: "Connected", sync: "Syncing...", fail: "Sync Failed",
+                client: "Client Name", phone: "Phone Num", amount: "Total Amount (₹)", interest: "Total Interest (₹)",
+                date: "Issue Date", status: "status", owner: "owner", coowner: "co-owner",
+                coamount: "co-owner amount (₹)", cointerest: "co-owner interest (₹)", payout: "payout type",
+                rate: "interest rate (%)", location: "Location", dept: "Department", referral: "Referal",
+                dealtby: "Dealt by", notes: "Notes / Remarks", addBtn: "Save Entry", updateBtn: "Update Entry",
+                addTitle: "Add New Record", editTitle: "Edit Client Record",
+                addDesc: "Saves financial entry tracking values back into your main spreadsheet matrix.",
+                editDesc: "Update financial entries and tracking statuses securely.",
+                cardAmount: "Active Capital", cardInterest: "Active Interest", cardClients: "Active Clients",
+                searchPlaceholder: "Search anything (Name, Phone, Location, Notes)...",
+                thClient: "Client Details", thLocation: "Location", thDate: "Issue Date",
+                thAmount: "Total Amount", thInterest: "Total Interest", thStatus: "Status", thAction: "Action",
+                barRefresh: "🔄 Refresh", barAdd: "➕ Add New", activePill: "Active", inactivePill: "Inactive",
+                editAction: "Edit"
+            },
+            te: {
+                title: "ఖాతా బుక్", connect: "కనెక్ట్ అయింది", sync: "అప్‌డేట్ అవుతోంది...", fail: "కనెక్షన్ విఫలమైంది",
+                client: "ఖాతాదారుని పేరు", phone: "ఫోన్ నంబర్", amount: "మొత్తం పెట్టుబడి (₹)", interest: "మొత్తం వడ్డీ (₹)",
+                date: "ఇచ్చిన తేదీ", status: "స్థితి (స్టేటస్)", owner: "యజమాని (ఓనర్)", coowner: "సహ భాగస్వామి",
+                coamount: "భాగస్వామి పెట్టుబడి (₹)", cointerest: "భాగస్వామి వడ్డీ (₹)", payout: "చెల్లింపు విధానం",
+                rate: "వడ్డీ రేటు (%)", location: "గ్రామం/ప్రాంతం", dept: "విభాగం (డిపార్ట్మెంట్)", referral: "సిఫార్సు చేసినవారు",
+                dealtby: "డీల్ చేసినవారు", notes: "గమనికలు / రిమార్కులు", addBtn: "వివరాలు సేవ్ చేయి", updateBtn: "మార్పులు సేవ్ చేయి",
+                addTitle: "కొత్త రికార్డు నమోదు చేయి", editTitle: "వివరాలు సవరించు",
+                addDesc: "కొత్త ఖాతాదారుని ఆర్థిక వివరాలను స్ప్రెడ్‌షీట్ లోకి భద్రపరుస్తుంది.",
+                editDesc: "ఖాతాదారుని వివరాలను మరియు ప్రస్తుత స్థితిని సురక్షితంగా మార్చండి.",
+                cardAmount: "యాక్టివ్ పెట్టుబడి", cardInterest: "యాక్టివ్ వడ్డీ", cardClients: "యాక్టివ్ ఖాతాదారులు",
+                searchPlaceholder: "ఏదైనా వెతకండి (పేరు, ఫోన్ నంబర్, ఊరు, గమనికలు)...",
+                thClient: "ఖాతాదారుని వివరాలు", thLocation: "గ్రామం/ప్రాంతం", thDate: "ఇచ్చిన తేదీ",
+                thAmount: "మొత్తం ధనం", thInterest: "మొత్తం వడ్డీ", thStatus: "స్థితి", thAction: "చర్య",
+                barRefresh: "🔄 రీఫ్రెష్", barAdd: "➕ కొత్త రికార్డు", activePill: "యాక్టివ్", inactivePill: "ఇనాక్టివ్",
+                editAction: "మార్చు"
+            }
+        };
+
+        // Complete Client Data Translation Dictionary (Data Rows Translator Extension)
+        const dataTranslationMap = {
+            "Active": "యాక్టివ్", "Inactive": "ఇనాక్టివ్", "Monthly": "నెలవారీ",
+            "Gorantla": "గోరంట్ల", "Dharmavaram": "ధర్మవరం", "Puttu": "పుట్టు",
+            "Mahesh": "మహేష్", "Narayna swamy": "నారాయణ స్వామి", "10000 cap repay": "10000 అసలు చెల్లింపు"
+        };
+
+        function translateValue(value) {
+            if (currentLanguage === 'en') return value;
+            const strVal = String(value).trim();
+            return dataTranslationMap[strVal] || strVal;
+        }
+
+        function toggleInterfaceLanguage() {
+            currentLanguage = (currentLanguage === 'en') ? 'te' : 'en';
+            document.getElementById('lang-btn').innerText = (currentLanguage === 'en') ? 'తెలుగు' : 'English';
+            applyInterfaceTranslations();
+            renderUIElements(dataStore);
+        }
+
+        function applyInterfaceTranslations() {
+            const t = dictionary[currentLanguage];
+            document.getElementById('nav-title').innerText = t.title;
+            document.getElementById('lbl-client').innerText = t.client;
+            document.getElementById('lbl-phone').innerText = t.phone;
+            document.getElementById('lbl-amount').innerText = t.amount;
+            document.getElementById('lbl-interest').innerText = t.interest;
+            document.getElementById('lbl-date').innerText = t.date;
+            document.getElementById('lbl-status').innerText = t.status;
+            document.getElementById('lbl-owner').innerText = t.owner;
+            document.getElementById('lbl-coowner').innerText = t.coowner;
+            document.getElementById('lbl-coamount').innerText = t.coamount;
+            document.getElementById('lbl-cointerest').innerText = t.cointerest;
+            document.getElementById('lbl-payout').innerText = t.payout;
+            document.getElementById('lbl-rate').innerText = t.rate;
+            document.getElementById('lbl-location').innerText = t.location;
+            document.getElementById('lbl-dept').innerText = t.dept;
+            document.getElementById('lbl-referral').innerText = t.referral;
+            document.getElementById('lbl-dealtby').innerText = t.dealtby;
+            document.getElementById('lbl-notes').innerText = t.notes;
+            
+            document.getElementById('submit-btn').innerText = isEditMode ? t.updateBtn : t.addBtn;
+            document.getElementById('form-title').innerText = isEditMode ? t.editTitle : t.addTitle;
+            document.getElementById('form-desc').innerText = isEditMode ? t.editDesc : t.addDesc;
+            
+            document.getElementById('card-lbl-amount').innerText = t.cardAmount;
+            document.getElementById('card-lbl-interest').innerText = t.cardInterest;
+            document.getElementById('card-lbl-clients').innerText = t.cardClients;
+            
+            document.getElementById('search-input').placeholder = t.searchPlaceholder;
+            
+            document.getElementById('btn-bar-refresh').innerText = t.barRefresh;
+            document.getElementById('btn-bar-add').innerText = t.barAdd;
+            
+            document.getElementById('table-header-row').innerHTML = `
+                <th>${t.thClient}</th>
+                <th>${t.thLocation}</th>
+                <th>${t.thDate}</th>
+                <th class="text-right">${t.thAmount}</th>
+                <th class="text-right">${t.thInterest}</th>
+                <th class="text-center">${t.thStatus}</th>
+                <th class="text-center">${t.thAction}</th>
+            `;
+        }
 
         function toggleFormDrawer(open) {
             const drawer = document.getElementById('form-drawer');
@@ -210,20 +323,17 @@
         function openCreateDrawer() {
             isEditMode = false;
             document.getElementById('ledger-form').reset();
-            document.getElementById('form-title').innerText = "Add New Record";
-            document.getElementById('form-desc').innerText = "Saves financial entry tracking values back into your main spreadsheet matrix.";
-            document.getElementById('submit-btn').innerText = "Save Entry";
+            applyInterfaceTranslations();
             toggleFormDrawer(true);
         }
 
         function initiateRowEdit(index, event) {
-            if(event) event.stopPropagation(); // Stops the accordion row expand code from running
+            if(event) event.stopPropagation(); 
             isEditMode = true;
             
             const row = dataStore[index];
             originalIdentityRef = { client: row["Client"], uid: row["RowUID"] };
 
-            // Prefill inputs based on matching column configuration tags
             document.getElementById('form-client').value = row["Client"] || "";
             document.getElementById('form-phone').value = row["Phone Num"] || "";
             document.getElementById('form-date').value = row["Issue_date"] || "";
@@ -242,10 +352,7 @@
             document.getElementById('form-notes').value = row["Notes"] || "";
             document.getElementById('form-status').value = row["status"] || "Active";
 
-            document.getElementById('form-title').innerText = "Edit Client Record";
-            document.getElementById('form-desc').innerText = "Update financial entries and tracking statuses securely.";
-            document.getElementById('submit-btn').innerText = "Update Entry";
-
+            applyInterfaceTranslations();
             toggleFormDrawer(true);
         }
 
@@ -253,7 +360,6 @@
             const el = document.getElementById(`${type}-details-${id}`);
             if(el) {
                 const isOpen = el.classList.contains('open');
-                // Close any open sheets first
                 document.querySelectorAll('.expandable-detail-row, .mobile-expand-details').forEach(d => d.classList.remove('open'));
                 if(!isOpen) el.classList.add('open');
             }
@@ -262,8 +368,7 @@
         function reloadDashboardData() {
             if(GOOGLE_API_URL.includes('PASTE_YOUR_COPIED')) return;
             const statusEl = document.getElementById('sync-status');
-            statusEl.innerText = "Syncing...";
-            statusEl.style.backgroundColor = "#4f46e5";
+            statusEl.innerText = dictionary[currentLanguage].sync;
 
             const oldScript = document.getElementById('jsonp-script');
             if (oldScript) oldScript.remove();
@@ -275,21 +380,22 @@
         }
 
         window.handleJsonpResponse = function(data) {
+            const statusEl = document.getElementById('sync-status');
             if (data && !data.error) {
                 dataStore = data;
                 renderUIElements(dataStore);
-                document.getElementById('sync-status').innerText = "Live Connected";
-                document.getElementById('sync-status').style.backgroundColor = "#10b981";
+                statusEl.innerText = dictionary[currentLanguage].connect;
+                statusEl.style.backgroundColor = "#10b981";
             } else {
-                document.getElementById('sync-status').innerText = "Sync Error";
-                document.getElementById('sync-status').style.backgroundColor = "#ef4444";
+                statusEl.innerText = dictionary[currentLanguage].fail;
+                statusEl.style.backgroundColor = "#ef4444";
             }
         };
 
         async function handleFormSubmission(event) {
             event.preventDefault();
             const btn = document.getElementById('submit-btn');
-            btn.disabled = true; btn.innerText = "PROCESSING CLOUD ROW SAVE...";
+            btn.disabled = true; btn.innerText = "...";
 
             const payload = {
                 action: isEditMode ? "edit" : "insert",
@@ -316,121 +422,9 @@
 
             try {
                 await fetch(GOOGLE_API_URL, { method: 'POST', body: JSON.stringify(payload) });
-                alert(isEditMode ? "Record successfully saved!" : "New entry added successfully!");
-                document.getElementById('ledger-form').reset();
-                toggleFormDrawer(false);
-                setTimeout(reloadDashboardData, 1000); // 1 second reload
-            } catch (error) {
-                alert(isEditMode ? "Record successfully saved!" : "New entry added successfully!");
+                alert(currentLanguage === 'en' ? "Saved successfully!" : "వివరాలు విజయవంతంగా భద్రపరచబడ్డాయి!");
                 document.getElementById('ledger-form').reset();
                 toggleFormDrawer(false);
                 setTimeout(reloadDashboardData, 1000);
-            } finally {
-                btn.disabled = false; btn.innerText = isEditMode ? "Update Entry" : "Save Entry";
-            }
-        }
-
-        function renderUIElements(data) {
-            const tbody = document.getElementById('table-body');
-            const mList = document.getElementById('mobile-list');
-            tbody.innerHTML = ""; mList.innerHTML = "";
-            
-            let totalAmountSum = 0, totalInterestSum = 0;
-
-            data.forEach((row, idx) => {
-                const amount = parseFloat(row["Total Amount"]) || 0;
-                const interest = parseFloat(row["total interest"]) || 0;
-                const statusStr = (row["status"] || "Active").trim();
-                const isInactive = statusStr.toLowerCase() === "inactive";
-
-                totalAmountSum += amount; 
-                totalInterestSum += interest;
-
-                const strikeClass = isInactive ? "record-inactive" : "";
-
-                // 1. Desktop Output Grid (Collapsible)
-                tbody.innerHTML += `
-                    <tr class="desktop-row-clickable ${strikeClass}" onclick="toggleRowAccordion(${idx}, 'desktop')">
-                        <td><strong style="font-size:0.95rem; color:#0f172a;">${row["Client"] || '-'}</strong><br><small style="color:#64748b;">Mob: ${row["Phone Num"] || '-'}</small></td>
-                        <td>${row["Location"] || '-'}</td>
-                        <td>${row["Issue_date"] || '-'}</td>
-                        <td class="text-right font-mono">${formatRupee(amount)}</td>
-                        <td class="text-right font-mono" style="color:#059669;">${formatRupee(interest)}</td>
-                        <td class="text-center"><span class="pill ${isInactive ? 'pill-overdue':'pill-completed'}">${statusStr}</span></td>
-                        <td class="text-center"><a class="action-link edit-link" onclick="initiateRowEdit(${idx}, event)">Edit</a></td>
-                    </tr>
-                    <tr id="desktop-details-${idx}" class="expandable-detail-row"><td colspan="7">
-                        <div class="details-wrapper">
-                            <div>
-                                <strong>Management Breakup:</strong><br>
-                                • Main Owner: ${row["owner"] || '-'}<br>
-                                • Co-Owner: ${row["co-owner"] || '-'} (${formatRupee(row["co-owner amount"])})<br>
-                                • Co-Owner Interest: ${formatRupee(row["co-owner interest"])}
-                            </div>
-                            <div>
-                                <strong>Deal Parameters:</strong><br>
-                                • Interest Rate: ${row["interest rate"] || 0}%<br>
-                                • Payout Type: ${row["payout type"] || '-'} <br>
-                                • Department: ${row["Department"] || '-'}
-                            </div>
-                            <div>
-                                <strong>Audit & Logs:</strong><br>
-                                • Referral: ${row["Referal"] || '-'} <br>
-                                • Dealt By: ${row["Dealt by"] || '-'} <br>
-                                • <strong>Notes:</strong> ${row["Notes"] || '-'}
-                            </div>
-                        </div>
-                    </td></tr>`;
-
-                // 2. Mobile Output Grid (Collapsible)
-                mList.innerHTML += `
-                    <div class="mobile-card ${strikeClass}" onclick="toggleRowAccordion(${idx}, 'mobile')">
-                        <div class="mobile-card-header">
-                            <strong>${row["Client"] || '-'}</strong>
-                            <div style="font-size:0.75rem; color:#64748b; margin-top:0.25rem;">📍 ${row["Location"] || '-'} | 📅 ${row["Issue_date"] || '-'}</div>
-                        </div>
-                        <div class="mobile-badge-pos">
-                            <span class="pill ${isInactive ? 'pill-overdue':'pill-completed'}" style="margin-bottom:0.4rem; display:block;">${statusStr}</span>
-                            <a class="action-link edit-link" onclick="initiateRowEdit(${idx}, event)">Edit</a>
-                        </div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; margin-top:0.75rem; font-family:monospace; font-size:0.9rem;">
-                            <div><span style="font-family:sans-serif; font-size:0.65rem; color:#64748b; display:block; text-transform:uppercase;">Total Capital</span>${formatRupee(amount)}</div>
-                            <div class="text-right"><span style="font-family:sans-serif; font-size:0.65rem; color:#64748b; display:block; text-transform:uppercase;">Interest</span><span style="color:#059669;">${formatRupee(interest)}</span></div>
-                        </div>
-                        
-                        <div id="mobile-details-${idx}" class="mobile-expand-details">
-                            <strong>• Owner:</strong> ${row["owner"] || '-'}<br>
-                            <strong>• Co-Owner:</strong> ${row["co-owner"] || '-'} (${formatRupee(row["co-owner amount"])})<br>
-                            <strong>• Co-Owner Interest:</strong> ${formatRupee(row["co-owner interest"])}<br>
-                            <strong>• Interest Rate:</strong> ${row["interest rate"] || 0}%<br>
-                            <strong>• Payout Type:</strong> ${row["payout type"] || '-'}<br>
-                            <strong>• Department:</strong> ${row["Department"] || '-'} <br>
-                            <strong>• Referral:</strong> ${row["Referal"] || '-'}<br>
-                            <strong>• Dealt By:</strong> ${row["Dealt by"] || '-'}<br>
-                            <strong style="margin-top:0.25rem; display:block;">• Notes:</strong> ${row["Notes"] || '-'}
-                        </div>
-                    </div>`;
-            });
-
-            document.getElementById('metric-amount').innerText = formatRupee(totalAmountSum);
-            document.getElementById('metric-interest').innerText = formatRupee(totalInterestSum);
-            document.getElementById('metric-clients').innerText = data.length;
-        }
-
-        function formatRupee(val) {
-            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
-        }
-
-        // Global Search Filter Engine over all 17 Column Parameters
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            const matchingRows = dataStore.filter(row => {
-                return Object.values(row).some(val => String(val).toLowerCase().includes(query));
-            });
-            renderUIElements(matchingRows);
-        });
-
-        window.addEventListener('DOMContentLoaded', reloadDashboardData);
-    </script>
-</body>
-</html>
+            } catch (error) {
+                alert(currentLanguage === 'en' ? "Saved successfully!" : "వివరాలు విజయవంతంగా భద్రపరచబడ్డ
