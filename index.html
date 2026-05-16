@@ -9,9 +9,10 @@
         nav { background-color: #0f172a; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 40; }
         nav h1 { margin: 0; font-size: 1.25rem; font-weight: 700; color: #f8fafc; }
         
-        /* Language Toggle Button Component styling rules */
-        .lang-toggle-btn { background-color: #3b82f6; color: white; border: none; padding: 0.4rem 0.8rem; font-weight: 700; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: background 0.15s ease; }
-        .lang-toggle-btn:hover { background-color: #2563eb; }
+        /* Language Toggle Switch Styles */
+        .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+        .lang-btn { background-color: #2563eb; color: white; border: none; padding: 0.35rem 0.75rem; font-weight: 700; border-radius: 6px; cursor: pointer; font-size: 0.8rem; border: 1px solid #3b82f6; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .lang-btn:hover { background-color: #1d4ed8; }
         .status-badge { font-size: 0.75rem; background-color: #334155; padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 600; color: #f1f5f9; }
         
         main { max-width: 1280px; margin: 0 auto; padding: 1rem; }
@@ -90,7 +91,7 @@
             .mobile-card { display: block; } 
         }
         
-        /* Dual Floating Setup at Screen Base */
+        /* Bottom Actions Control Bar for Mobile View Screens */
         .button-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); padding: 0.75rem 1rem; display: flex; justify-content: center; gap: 1rem; z-index: 80; border-top: 1px solid #e2e8f0; }
         .bar-btn { flex: 1; max-width: 200px; border: none; padding: 0.75rem; font-weight: 700; border-radius: 8px; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; text-align: center; }
         .btn-add { background-color: #0f172a; color: white; }
@@ -103,9 +104,9 @@
 
     <nav>
         <h1 id="nav-title">Khata Book</h1>
-        <div>
-            <!-- One-tap Language Change Button -->
-            <button id="lang-btn" class="lang-toggle-btn" onclick="toggleInterfaceLanguage()">తెలుగు</button>
+        <div class="nav-actions">
+            <!-- Language Toggle Action Button -->
+            <button id="lang-switch-btn" class="lang-btn" onclick="toggleLanguage()">తెలుగు</button>
             <span id="sync-status" class="status-badge">Connecting...</span>
         </div>
     </nav>
@@ -161,30 +162,30 @@
             </form>
         </section>
 
-        <!-- Dynamic Group Total Metrics Cards (Active Only Calculation Rules) -->
+        <!-- Dynamic Summary Metrics Cards -->
         <section class="metrics-grid">
             <div class="metric-card"><p id="card-lbl-amount" class="metric-label">Active Capital</p><h3 id="metric-amount" class="metric-val">₹0</h3></div>
             <div class="metric-card"><p id="card-lbl-interest" class="metric-label">Active Interest</p><h3 id="metric-interest" class="metric-val" style="color: #059669;">₹0</h3></div>
             <div class="metric-card"><p id="card-lbl-clients" class="metric-label">Active Clients</p><h3 id="metric-clients" class="metric-val" style="color: #2563eb;">0</h3></div>
         </section>
 
-        <!-- Global Multi-Column Filter Field Block -->
+        <!-- Global Multi-Column Search Field Block -->
         <section class="search-container">
-            <input type="text" id="search-input" placeholder="Search anything (Name, Phone, Location, Notes)..." class="form-control" style="padding: 0.75rem; font-size: 0.9rem;">
+            <input type="text" id="search-input" placeholder="Search anything (Name, Phone, Location, Notes, Referral, Status)..." class="form-control" style="padding: 0.75rem; font-size: 0.9rem;">
         </section>
 
-        <!-- Ledger Master Matrix Views Area -->
+        <!-- Ledger Tables Section -->
         <section class="table-container">
             <table class="desktop-table">
                 <thead>
-                    <tr id="table-header-row">
-                        <th>Client Details</th>
-                        <th>Location</th>
-                        <th>Issue Date</th>
-                        <th class="text-right">Total Amount</th>
-                        <th class="text-right">Total Interest</th>
-                        <th class="text-center">Status</th>
-                        <th class="text-center">Action</th>
+                    <tr>
+                        <th id="th-client">Client Details</th>
+                        <th id="th-location">Location</th>
+                        <th id="th-date">Issue Date</th>
+                        <th id="th-amount" class="text-right">Total Amount</th>
+                        <th id="th-interest" class="text-right">Total Interest</th>
+                        <th id="th-status" class="text-center">Status</th>
+                        <th id="th-action" class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
@@ -198,119 +199,174 @@
         <button id="btn-bar-refresh" class="bar-btn btn-refresh" onclick="reloadDashboardData()">🔄 Refresh</button>
         <button id="btn-bar-add" class="bar-btn btn-add" onclick="openCreateDrawer()">➕ Add New</button>
     </div>
+    <!-- Main Dashboard Container -->
+    <main>
+        <!-- Data Entry & Edit Shared Modal Form Drawer -->
+        <section id="form-drawer" class="panel">
+            <button type="button" class="drawer-close-btn" onclick="toggleFormDrawer(false)">✕</button>
+            <h2 id="form-title" class="panel-title" data-lan="addRecord">Add New Record</h2>
+            <p id="form-desc" class="panel-desc" data-lan="formDesc">Saves financial entry tracking values back into your main spreadsheet matrix.</p>
+            
+            <form id="ledger-form" onsubmit="handleFormSubmission(event)">
+                <div class="grid-2">
+                    <div class="form-group"><label data-lan="client">Client Name</label><input type="text" id="form-client" class="form-control"></div>
+                    <div class="form-group"><label data-lan="phone">Phone Num</label><input type="text" id="form-phone" class="form-control"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label data-lan="amount">Total Amount (₹)</label><input type="number" id="form-amount" class="form-control"></div>
+                    <div class="form-group"><label data-lan="interest">Total Interest (₹)</label><input type="number" id="form-interest" class="form-control"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label data-lan="date">Issue Date</label><input type="date" id="form-date" class="form-control"></div>
+                    <div class="form-group">
+                        <label data-lan="status">Status</label>
+                        <select id="form-status" class="form-control">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label data-lan="owner">Owner</label><input type="text" id="form-owner" class="form-control"></div>
+                    <div class="form-group"><label data-lan="coOwner">Co-Owner</label><input type="text" id="form-coowner" class="form-control"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label data-lan="coAmount">Co-Owner Amount (₹)</label><input type="number" id="form-coamount" class="form-control"></div>
+                    <div class="form-group"><label data-lan="coInterest">Co-Owner Interest (₹)</label><input type="number" id="form-cointerest" class="form-control"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label data-lan="payout">Payout Type</label><input type="text" id="form-payout" class="form-control"></div>
+                    <div class="form-group"><label data-lan="rate">Interest Rate (%)</label><input type="number" step="0.01" id="form-rate" class="form-control"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label data-lan="location">Location</label><input type="text" id="form-location" class="form-control"></div>
+                    <div class="form-group"><label data-lan="dept">Department</label><input type="text" id="form-dept" class="form-control"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label data-lan="referral">Referral</label><input type="text" id="form-referral" class="form-control"></div>
+                    <div class="form-group"><label data-lan="dealtBy">Dealt By</label><input type="text" id="form-dealtby" class="form-control"></div>
+                </div>
+                <div class="form-group"><label data-lan="notes">Notes / Remarks</label><textarea id="form-notes" rows="2" class="form-control"></textarea></div>
+                <button type="submit" id="submit-btn" class="submit-btn" data-lan="saveEntry">Save Entry</button>
+            </form>
+        </section>
+
+        <!-- Summary Metrics Dashboard Rows (Calculated dynamically for Active statuses only) -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <p class="metric-label" data-lan="activeCapital">Active Capital</p>
+                <h3 id="metric-amount" class="metric-val">₹0</h3>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label" data-lan="activeInterest">Active Interest</p>
+                <h3 id="metric-interest" class="metric-val" style="color: #059669;">₹0</h3>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label" data-lan="activeClients">Active Clients</p>
+                <h3 id="metric-clients" class="metric-val" style="color: #2563eb;">0</h3>
+            </div>
+        </section>
+
+        <!-- Global Multi-Column Search Field Layout component -->
+        <section class="search-container">
+            <input type="text" id="search-input" class="form-control" style="padding: 0.75rem; font-size: 0.9rem;">
+        </section>
+
+        <!-- Ledger Tables Section -->
+        <section class="table-container">
+            <table class="desktop-table">
+                <thead>
+                    <tr>
+                        <th data-lan="thClient">Client Details</th>
+                        <th data-lan="location">Location</th>
+                        <th data-lan="thDate">Issue Date</th>
+                        <th class="text-right" data-lan="thAmount">Total Amount</th>
+                        <th class="text-right" data-lan="thInterest">Total Interest</th>
+                        <th class="text-center" data-lan="status">Status</th>
+                        <th class="text-center" data-lan="thAction">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+            <div id="mobile-list"></div>
+        </section>
+    </main>
+
+    <!-- Navigation Control Bar for Mobile Smartphone Layouts -->
+    <div class="button-bar">
+        <button class="bar-btn btn-refresh" onclick="reloadDashboardData()" data-lan="refresh">🔄 Refresh</button>
+        <button class="bar-btn btn-add" onclick="openCreateDrawer()" data-lan="addNew">➕ Add New</button>
+    </div>
 
     <script>
         // =========================================================================
-        // PASTE YOUR BRAND NEW WEB APP URL LINK RIGHT HERE EXACTLY:
+        // DEPLOYMENT INTERFACE CONFIGURATION
+        // =========================================================================
         const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbzvESczzb2t7Eb0BWOLiuOGRmfZ6brHRbI0WppiYj2RiX5gnQXhV8w17pSl_Jgn58cr8A/exec';
         // =========================================================================
 
         let dataStore = [];
+        let currentLanguage = 'en'; 
         let isEditMode = false;
-        let currentLanguage = 'en'; // Tracks current translation matrix: 'en' or 'te'
         let originalIdentityRef = {}; 
 
-        // Comprehensive English -> Telugu Interface Translation Dictionary Matrix
-        const dictionary = {
+        // Dual-Language Dictionary Storage Blueprint
+        const translations = {
             en: {
-                title: "Khata Book", connect: "Connected", sync: "Syncing...", fail: "Sync Failed",
+                appName: "Khata Book", connecting: "Connecting...", liveConnected: "Live Connected", syncError: "Sync Error",
+                addRecord: "Add New Record", editRecord: "Edit Client Record", formDesc: "Saves financial tracking values directly to your main spreadsheet matrix.",
                 client: "Client Name", phone: "Phone Num", amount: "Total Amount (₹)", interest: "Total Interest (₹)",
-                date: "Issue Date", status: "status", owner: "owner", coowner: "co-owner",
-                coamount: "co-owner amount (₹)", cointerest: "co-owner interest (₹)", payout: "payout type",
-                rate: "interest rate (%)", location: "Location", dept: "Department", referral: "Referal",
-                dealtby: "Dealt by", notes: "Notes / Remarks", addBtn: "Save Entry", updateBtn: "Update Entry",
-                addTitle: "Add New Record", editTitle: "Edit Client Record",
-                addDesc: "Saves financial entry tracking values back into your main spreadsheet matrix.",
-                editDesc: "Update financial entries and tracking statuses securely.",
-                cardAmount: "Active Capital", cardInterest: "Active Interest", cardClients: "Active Clients",
-                searchPlaceholder: "Search anything (Name, Phone, Location, Notes)...",
-                thClient: "Client Details", thLocation: "Location", thDate: "Issue Date",
-                thAmount: "Total Amount", thInterest: "Total Interest", thStatus: "Status", thAction: "Action",
-                barRefresh: "🔄 Refresh", barAdd: "➕ Add New", activePill: "Active", inactivePill: "Inactive",
-                editAction: "Edit"
+                date: "Issue Date", status: "Status", owner: "Owner", coOwner: "Co-Owner", coAmount: "Co-Owner Amount (₹)",
+                coInterest: "Co-Owner Interest (₹)", payout: "Payout Type", rate: "Interest Rate (%)", location: "Location",
+                dept: "Department", referral: "Referral", dealtBy: "Dealt By", notes: "Notes / Remarks", saveEntry: "Save Entry",
+                updateEntry: "Update Entry", activeCapital: "Active Capital", activeInterest: "Active Interest", activeClients: "Active Clients",
+                searchPlaceholder: "Search anything (Name, Phone, Location, Notes, Referral, Status)...",
+                thClient: "Client Details", thDate: "Issue Date", thAmount: "Total Amount", thInterest: "Total Interest", thAction: "Action",
+                refresh: "🔄 Refresh", addNew: "➕ Add New", mob: "Mob", active: "Active", inactive: "Inactive", edit: "Edit",
+                mgmtBreakdown: "Management Breakup", mainOwner: "Main Owner", dealParam: "Deal Parameters", auditLogs: "Audit & Logs",
+                noMatch: "No records match your search criteria.", loadingMsg: "Processing sync operations..."
             },
             te: {
-                title: "ఖాతా బుక్", connect: "కనెక్ట్ అయింది", sync: "అప్‌డేట్ అవుతోంది...", fail: "కనెక్షన్ విఫలమైంది",
-                client: "ఖాతాదారుని పేరు", phone: "ఫోన్ నంబర్", amount: "మొత్తం పెట్టుబడి (₹)", interest: "మొత్తం వడ్డీ (₹)",
-                date: "ఇచ్చిన తేదీ", status: "స్థితి (స్టేటస్)", owner: "యజమాని (ఓనర్)", coowner: "సహ భాగస్వామి",
-                coamount: "భాగస్వామి పెట్టుబడి (₹)", cointerest: "భాగస్వామి వడ్డీ (₹)", payout: "చెల్లింపు విధానం",
-                rate: "వడ్డీ రేటు (%)", location: "గ్రామం/ప్రాంతం", dept: "విభాగం (డిపార్ట్మెంట్)", referral: "సిఫార్సు చేసినవారు",
-                dealtby: "డీల్ చేసినవారు", notes: "గమనికలు / రిమార్కులు", addBtn: "వివరాలు సేవ్ చేయి", updateBtn: "మార్పులు సేవ్ చేయి",
-                addTitle: "కొత్త రికార్డు నమోదు చేయి", editTitle: "వివరాలు సవరించు",
-                addDesc: "కొత్త ఖాతాదారుని ఆర్థిక వివరాలను స్ప్రెడ్‌షీట్ లోకి భద్రపరుస్తుంది.",
-                editDesc: "ఖాతాదారుని వివరాలను మరియు ప్రస్తుత స్థితిని సురక్షితంగా మార్చండి.",
-                cardAmount: "యాక్టివ్ పెట్టుబడి", cardInterest: "యాక్టివ్ వడ్డీ", cardClients: "యాక్టివ్ ఖాతాదారులు",
-                searchPlaceholder: "ఏదైనా వెతకండి (పేరు, ఫోన్ నంబర్, ఊరు, గమనికలు)...",
-                thClient: "ఖాతాదారుని వివరాలు", thLocation: "గ్రామం/ప్రాంతం", thDate: "ఇచ్చిన తేదీ",
-                thAmount: "మొత్తం ధనం", thInterest: "మొత్తం వడ్డీ", thStatus: "స్థితి", thAction: "చర్య",
-                barRefresh: "🔄 రీఫ్రెష్", barAdd: "➕ కొత్త రికార్డు", activePill: "యాక్టివ్", inactivePill: "ఇనాక్టివ్",
-                editAction: "మార్చు"
+                appName: "ఖాతా బుక్", connecting: "కనెక్ట్ అవుతోంది...", liveConnected: "లైవ్ కనెక్ట్ చేయబడింది", syncError: "సమకాలీకరణ లోపం",
+                addRecord: "కొత్త రికార్డును జోడించండి", editRecord: "క్లయింట్ రికార్డును సవరించండి", formDesc: "ఆర్థిక ట్రాకింగ్ విలువలను నేరుగా మీ ప్రధాన స్ప్రెడ్‌షీట్ మ్యాట్రిక్స్‌కు సేవ్ చేస్తుంది.",
+                client: "క్లయింట్ పేరు", phone: "ఫోన్ నంబర్", amount: "మొత్తం డబ్బు (₹)", interest: "మొత్తం వడ్డీ (₹)",
+                date: "జారీ చేసిన తేదీ", status: "స్థితి (స్టేటస్)", owner: "యజమాని (ఓనర్)", coOwner: "సహ-యజమాని (కో-ఓనర్)", coAmount: "సహ-యజమాని మొత్తం (₹)",
+                coInterest: "సహ-యజమాని వడ్డీ (₹)", payout: "చెల్లింపు రకం", rate: "వడ్డీ రేటు (%)", location: "ప్రాంతం (location)",
+                dept: "విభాగం (Department)", referral: "రెఫరల్", dealtBy: "డీల్ చేసిన వారు", notes: "గమనికలు / రిమార్కులు", saveEntry: "సేవ్ చేయండి",
+                updateEntry: "అప్‌డేట్ చేయండి", activeCapital: "యాక్టివ్ పెట్టుబడి", activeInterest: "యాక్టివ్ వడ్డీ", activeClients: "యాక్టివ్ క్లయింట్లు",
+                searchPlaceholder: "ఏదైనా వెతకండి (పేరు, ఫోన్, ప్రాంతం, గమనికలు, స్టేటస్)...",
+                thClient: "క్లయింట్ వివరాలు", thDate: "జారీ తేదీ", thAmount: "మొత్తం సొమ్ము", thInterest: "మొత్తం వడ్డీ", thAction: "చర్య",
+                refresh: "🔄 రీఫ్రెష్", addNew: "➕ కొత్తది జోడించు", mob: "ఫోన్", active: "యాక్టివ్", inactive: "ఇన్-యాక్టివ్", edit: "సవరించు",
+                mgmtBreakdown: "నిర్వహణ విభజన", mainOwner: "ప్రధాన యజమాని", dealParam: "డీల్ పారామితులు", auditLogs: "ఆడిట్ & లాగ్‌లు",
+                noMatch: "మీ శోధన ప్రమాణాలకు సరిపోలే రికార్డులు లేవు.", loadingMsg: "సమకాలీకరణ ప్రక్రియ నడుస్తోంది..."
             }
         };
 
-        // Complete Client Data Translation Dictionary (Data Rows Translator Extension)
-        const dataTranslationMap = {
-            "Active": "యాక్టివ్", "Inactive": "ఇనాక్టివ్", "Monthly": "నెలవారీ",
-            "Gorantla": "గోరంట్ల", "Dharmavaram": "ధర్మవరం", "Puttu": "పుట్టు",
-            "Mahesh": "మహేష్", "Narayna swamy": "నారాయణ స్వామి", "10000 cap repay": "10000 అసలు చెల్లింపు"
-        };
-
-        function translateValue(value) {
-            if (currentLanguage === 'en') return value;
-            const strVal = String(value).trim();
-            return dataTranslationMap[strVal] || strVal;
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('[data-lan]').forEach(el => {
+                const key = el.getAttribute('data-lan');
+                if (translations[lang][key]) el.innerText = translations[lang][key];
+            });
+            
+            // Handle placeholders input switch sequences
+            const searchBar = document.getElementById('search-input');
+            if(searchBar) searchBar.placeholder = translations[lang].searchPlaceholder;
+            
+            // Re-render UI table list items to refresh dataset language bindings
+            if(dataStore.length > 0) renderUIElements(dataStore);
         }
 
-        function toggleInterfaceLanguage() {
-            currentLanguage = (currentLanguage === 'en') ? 'te' : 'en';
-            document.getElementById('lang-btn').innerText = (currentLanguage === 'en') ? 'తెలుగు' : 'English';
-            applyInterfaceTranslations();
-            renderUIElements(dataStore);
-        }
-
-        function applyInterfaceTranslations() {
-            const t = dictionary[currentLanguage];
-            document.getElementById('nav-title').innerText = t.title;
-            document.getElementById('lbl-client').innerText = t.client;
-            document.getElementById('lbl-phone').innerText = t.phone;
-            document.getElementById('lbl-amount').innerText = t.amount;
-            document.getElementById('lbl-interest').innerText = t.interest;
-            document.getElementById('lbl-date').innerText = t.date;
-            document.getElementById('lbl-status').innerText = t.status;
-            document.getElementById('lbl-owner').innerText = t.owner;
-            document.getElementById('lbl-coowner').innerText = t.coowner;
-            document.getElementById('lbl-coamount').innerText = t.coamount;
-            document.getElementById('lbl-cointerest').innerText = t.cointerest;
-            document.getElementById('lbl-payout').innerText = t.payout;
-            document.getElementById('lbl-rate').innerText = t.rate;
-            document.getElementById('lbl-location').innerText = t.location;
-            document.getElementById('lbl-dept').innerText = t.dept;
-            document.getElementById('lbl-referral').innerText = t.referral;
-            document.getElementById('lbl-dealtby').innerText = t.dealtby;
-            document.getElementById('lbl-notes').innerText = t.notes;
-            
-            document.getElementById('submit-btn').innerText = isEditMode ? t.updateBtn : t.addBtn;
-            document.getElementById('form-title').innerText = isEditMode ? t.editTitle : t.addTitle;
-            document.getElementById('form-desc').innerText = isEditMode ? t.editDesc : t.addDesc;
-            
-            document.getElementById('card-lbl-amount').innerText = t.cardAmount;
-            document.getElementById('card-lbl-interest').innerText = t.cardInterest;
-            document.getElementById('card-lbl-clients').innerText = t.cardClients;
-            
-            document.getElementById('search-input').placeholder = t.searchPlaceholder;
-            
-            document.getElementById('btn-bar-refresh').innerText = t.barRefresh;
-            document.getElementById('btn-bar-add').innerText = t.barAdd;
-            
-            document.getElementById('table-header-row').innerHTML = `
-                <th>${t.thClient}</th>
-                <th>${t.thLocation}</th>
-                <th>${t.thDate}</th>
-                <th class="text-right">${t.thAmount}</th>
-                <th class="text-right">${t.thInterest}</th>
-                <th class="text-center">${t.thStatus}</th>
-                <th class="text-center">${t.thAction}</th>
-            `;
+        function translateDataValue(val) {
+            if (!val) return '-';
+            const clean = val.toString().trim().toLowerCase();
+            if (currentLanguage === 'te') {
+                if (clean === 'active') return 'యాక్టివ్';
+                if (clean === 'inactive') return 'ఇన్-యాక్టివ్';
+                if (clean === 'monthly') return 'నెలవారీ';
+                if (clean === 'yearly') return 'వార్షిక';
+            }
+            return val;
         }
 
         function toggleFormDrawer(open) {
@@ -323,7 +379,13 @@
         function openCreateDrawer() {
             isEditMode = false;
             document.getElementById('ledger-form').reset();
-            applyInterfaceTranslations();
+            document.getElementById('form-date').valueAsDate = new Date();
+            
+            const lang = translations[currentLanguage];
+            document.getElementById('form-title').innerText = lang.addRecord;
+            document.getElementById('form-desc').innerText = lang.formDesc;
+            document.getElementById('submit-btn').innerText = lang.saveEntry;
+            
             toggleFormDrawer(true);
         }
 
@@ -352,7 +414,10 @@
             document.getElementById('form-notes').value = row["Notes"] || "";
             document.getElementById('form-status').value = row["status"] || "Active";
 
-            applyInterfaceTranslations();
+            const lang = translations[currentLanguage];
+            document.getElementById('form-title').innerText = lang.editRecord;
+            document.getElementById('submit-btn').innerText = lang.updateEntry;
+
             toggleFormDrawer(true);
         }
 
@@ -368,7 +433,8 @@
         function reloadDashboardData() {
             if(GOOGLE_API_URL.includes('PASTE_YOUR_COPIED')) return;
             const statusEl = document.getElementById('sync-status');
-            statusEl.innerText = dictionary[currentLanguage].sync;
+            statusEl.innerText = translations[currentLanguage].connecting;
+            statusEl.style.backgroundColor = "#4f46e5";
 
             const oldScript = document.getElementById('jsonp-script');
             if (oldScript) oldScript.remove();
@@ -384,10 +450,10 @@
             if (data && !data.error) {
                 dataStore = data;
                 renderUIElements(dataStore);
-                statusEl.innerText = dictionary[currentLanguage].connect;
+                statusEl.innerText = translations[currentLanguage].liveConnected;
                 statusEl.style.backgroundColor = "#10b981";
             } else {
-                statusEl.innerText = dictionary[currentLanguage].fail;
+                statusEl.innerText = translations[currentLanguage].syncError;
                 statusEl.style.backgroundColor = "#ef4444";
             }
         };
@@ -422,9 +488,137 @@
 
             try {
                 await fetch(GOOGLE_API_URL, { method: 'POST', body: JSON.stringify(payload) });
-                alert(currentLanguage === 'en' ? "Saved successfully!" : "వివరాలు విజయవంతంగా భద్రపరచబడ్డాయి!");
+                alert(currentLanguage === 'te' ? "రికార్డు విజయవంతంగా సేవ్ చేయబడింది!" : "Record successfully saved!");
                 document.getElementById('ledger-form').reset();
                 toggleFormDrawer(false);
-                setTimeout(reloadDashboardData, 1000);
+                setTimeout(reloadDashboardData, 1200); 
             } catch (error) {
-                alert(currentLanguage === 'en' ? "Saved successfully!" : "వివరాలు విజయవంతంగా భద్రపరచబడ్డ
+                alert(currentLanguage === 'te' ? "రికార్డు విజయవంతంగా సేవ్ చేయబడింది!" : "Record successfully saved!");
+                document.getElementById('ledger-form').reset();
+                toggleFormDrawer(false);
+                setTimeout(reloadDashboardData, 1200);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = isEditMode ? translations[currentLanguage].updateEntry : translations[currentLanguage].saveEntry;
+            }
+        }
+
+        function renderUIElements(data) {
+            const tbody = document.getElementById('table-body');
+            const mList = document.getElementById('mobile-list');
+            const lang = translations[currentLanguage];
+            
+            tbody.innerHTML = ""; mList.innerHTML = "";
+            let activeAmountSum = 0, activeInterestSum = 0, activeClientsCount = 0;
+
+            if(!data || data.length === 0) {
+                const emptyHTML = `<div style="padding: 2rem; text-align: center; color: #94a3b8; font-weight: 600;">${lang.noMatch}</div>`;
+                tbody.innerHTML = `<tr><td colspan="7">${emptyHTML}</td></tr>`;
+                mList.innerHTML = emptyHTML;
+                return;
+            }
+
+            data.forEach((row, idx) => {
+                const amount = parseFloat(row["Total Amount"]) || 0;
+                const interest = parseFloat(row["total interest"]) || 0;
+                const statusStr = (row["status"] || "Active").trim();
+                const isInactive = statusStr.toLowerCase() === "inactive";
+
+                // 🚨 Core Requirement: Summaries calculate strictly for Active rows
+                if (!isInactive) {
+                    activeAmountSum += amount; 
+                    activeInterestSum += interest;
+                    activeClientsCount++;
+                }
+
+                const strikeClass = isInactive ? "record-inactive" : "";
+
+                // 1. Desktop Output Elements
+                tbody.innerHTML += `
+                    <tr class="desktop-row-clickable ${strikeClass}" onclick="toggleRowAccordion(${idx}, 'desktop')">
+                        <td><strong style="font-size:0.95rem; color:#0f172a;">${translateDataValue(row["Client"])}</strong><br><small>${lang.mob}: ${row["Phone Num"] || '-'}</small></td>
+                        <td>${translateDataValue(row["Location"])}</td>
+                        <td>${row["Issue_date"] || '-'}</td>
+                        <td class="text-right font-mono">${formatRupee(amount)}</td>
+                        <td class="text-right font-mono" style="color:#059669;">${formatRupee(interest)}</td>
+                        <td class="text-center"><span class="pill ${isInactive ? 'pill-overdue':'pill-completed'}">${translateDataValue(statusStr)}</span></td>
+                        <td class="text-center"><a class="action-link edit-link" onclick="initiateRowEdit(${idx}, event)">${lang.edit}</a></td>
+                    </tr>
+                    <tr id="desktop-details-${idx}" class="expandable-detail-row"><td colspan="7">
+                        <div class="details-wrapper">
+                            <div>
+                                <strong>${lang.mgmtBreakdown}:</strong><br>
+                                • ${lang.mainOwner}: ${translateDataValue(row["owner"])}<br>
+                                • ${lang.coOwner}: ${translateDataValue(row["co-owner"])} (${formatRupee(row["co-owner amount"])})<br>
+                                • ${lang.coOwner} వడ్డీ: ${formatRupee(row["co-owner interest"])}
+                            </div>
+                            <div>
+                                <strong>${lang.dealParam}:</strong><br>
+                                • వడ్డీ రేటు (Rate): ${row["interest rate"] || 0}%<br>
+                                • ${lang.payout}: ${translateDataValue(row["payout type"])} <br>
+                                • ${lang.dept}: ${translateDataValue(row["Department"])}
+                            </div>
+                            <div>
+                                <strong>${lang.auditLogs}:</strong><br>
+                                • ${lang.referral}: ${translateDataValue(row["Referal"])} <br>
+                                • ${lang.dealtBy}: ${translateDataValue(row["Dealt by"])} <br>
+                                • <strong>${lang.notes}:</strong> ${translateDataValue(row["Notes"])}
+                            </div>
+                        </div>
+                    </td></tr>`;
+
+                // 2. Mobile Output Elements (Click to Expand)
+                mList.innerHTML += `
+                    <div class="mobile-card ${strikeClass}" onclick="toggleRowAccordion(${idx}, 'mobile')">
+                        <div class="mobile-card-header">
+                            <strong>${translateDataValue(row["Client"])}</strong>
+                            <div style="font-size:0.75rem; color:#64748b; margin-top:0.25rem;">📍 ${translateDataValue(row["Location"])} | 📅 ${row["Issue_date"] || '-'}</div>
+                        </div>
+                        <div class="mobile-badge-pos">
+                            <span class="pill ${isInactive ? 'pill-overdue':'pill-completed'}" style="margin-bottom:0.4rem; display:block;">${translateDataValue(statusStr)}</span>
+                            <a class="action-link edit-link" onclick="initiateRowEdit(${idx}, event)">${lang.edit}</a>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; margin-top:0.75rem; font-family:monospace; font-size:0.9rem; border-top:1px dashed #e2e8f0; padding-top:0.5rem;">
+                            <div><span style="font-family:sans-serif; font-size:0.65rem; color:#64748b; display:block; text-transform:uppercase;">${lang.thAmount}</span>${formatRupee(amount)}</div>
+                            <div class="text-right"><span style="font-family:sans-serif; font-size:0.65rem; color:#64748b; display:block; text-transform:uppercase;">${lang.thInterest}</span><span style="color:#059669;">${formatRupee(interest)}</span></div>
+                        </div>
+                        
+                        <div id="mobile-details-${idx}" class="mobile-expand-details">
+                            <strong>• ${lang.owner}:</strong> ${translateDataValue(row["owner"])}<br>
+                            <strong>• ${lang.coOwner}:</strong> ${translateDataValue(row["co-owner"])} (${formatRupee(row["co-owner amount"])})<br>
+                            <strong>• ${lang.coOwner} వడ్డీ:</strong> ${formatRupee(row["co-owner interest"])}<br>
+                            <strong>• వడ్డీ రేటు:</strong> ${row["interest rate"] || 0}%<br>
+                            <strong>• ${lang.payout}:</strong> ${translateDataValue(row["payout type"])}<br>
+                            <strong>• ${lang.dept}:</strong> ${translateDataValue(row["Department"])} <br>
+                            <strong>• ${lang.referral}:</strong> ${translateDataValue(row["Referal"])}<br>
+                            <strong>• ${lang.dealtBy}:</strong> ${translateDataValue(row["Dealt by"])}<br>
+                            <strong style="margin-top:0.25rem; display:block;">• ${lang.notes}:</strong> ${translateDataValue(row["Notes"])}
+                        </div>
+                    </div>`;
+            });
+
+            document.getElementById('metric-amount').innerText = formatRupee(activeAmountSum);
+            document.getElementById('metric-interest').innerText = formatRupee(activeInterestSum);
+            document.getElementById('metric-clients').innerText = activeClientsCount;
+        }
+
+        function formatRupee(val) {
+            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
+        }
+
+        // Global Multidimensional Filter Box matching terms across ALL 17 layout values
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            const matchingRows = dataStore.filter(row => {
+                return Object.values(row).some(val => String(val).toLowerCase().includes(query));
+            });
+            renderUIElements(matchingRows);
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            switchLanguage('en'); 
+            reloadDashboardData();
+        });
+    </script>
+</body>
+</html>
