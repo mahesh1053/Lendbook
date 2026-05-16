@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Khata Book</title>
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f9fafb; margin: 0; color: #1f2937; padding-bottom: 5rem; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; margin: 0; color: #1e293b; padding-bottom: 6rem; }
         nav { background-color: #0f172a; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 40; }
         nav h1 { margin: 0; font-size: 1.25rem; font-weight: 700; color: #f8fafc; }
         .status-badge { font-size: 0.75rem; background-color: #334155; padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 600; color: #f1f5f9; }
         main { max-width: 1280px; margin: 0 auto; padding: 1rem; }
         
-        /* Slide-Up Mobile Form Drawer styling rules */
-        .panel { background: white; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem; display: none; }
+        /* Slide-Up Mobile Form Drawer Panel Styling */
+        .panel { background: white; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem; display: none; }
         .panel.open { display: block; }
         @media (max-width: 1023px) {
             .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 1.25rem 1.25rem 0 0; box-shadow: 0 -10px 25px rgba(0,0,0,0.15); z-index: 100; padding: 1.5rem; border: none; max-height: 85vh; overflow-y: auto; margin-bottom: 0; }
@@ -33,44 +33,63 @@
         .submit-btn { width: 100%; padding: 0.75rem; background-color: #0f172a; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer; font-size: 0.85rem; text-transform: uppercase; margin-top: 0.5rem; }
         
         /* Financial Summary Cards Row */
-        .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
-        .metric-card { background: white; padding: 0.875rem 0.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .metric-label { font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin: 0; }
-        .metric-val { font-size: 1.25rem; font-weight: 700; margin: 0.25rem 0 0 0; color: #0f172a; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1.25rem; }
+        .metric-card { background: white; padding: 0.75rem 0.25rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .metric-label { font-size: 0.6rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin: 0; }
+        .metric-val { font-size: 1rem; font-weight: 700; margin: 0.25rem 0 0 0; color: #0f172a; }
+        @media (min-width: 768px) { .metric-val { font-size: 1.25rem; } }
         
         .search-container { background: white; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; margin-bottom: 1.25rem; }
         .table-container { background: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; overflow: hidden; }
         
-        /* Elegant Desktop Grid Design with Sub-rows */
+        /* Desktop Table Layout with Row Highlights */
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem; }
         th { background-color: #f1f5f9; padding: 0.875rem 1rem; font-weight: 700; color: #475569; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
         td { padding: 0.875rem 1rem; border-bottom: 1px solid #f1f5f9; }
-        .sub-row-details { font-size: 0.75rem; color: #64748b; background-color: #f8fafc; padding: 0.5rem 1rem; }
+        
+        /* Click-to-Expand Hidden Details Area */
+        .desktop-row-clickable { cursor: pointer; transition: background-color 0.15s ease; }
+        .desktop-row-clickable:hover { background-color: #f8fafc; }
+        .expandable-detail-row { display: none; background-color: #f8fafc; font-size: 0.75rem; color: #475569; border-bottom: 1px solid #e2e8f0; }
+        .expandable-detail-row.open { display: table-row; }
+        .details-wrapper { padding: 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; line-height: 1.5; }
         
         .text-right { text-align: right; }
         .text-center { text-align: center; }
         .font-mono { font-family: monospace; font-size: 0.85rem; font-weight: 600; }
         
-        .edit-link { color: #2563eb; font-weight: 600; cursor: pointer; text-decoration: none; font-size: 0.75rem; text-transform: uppercase; }
+        .action-link { font-weight: 600; cursor: pointer; text-decoration: none; font-size: 0.75rem; text-transform: uppercase; }
+        .edit-link { color: #2563eb; margin-right: 0.5rem; }
         .edit-link:hover { text-decoration: underline; }
         
-        /* 🚨 Core Requirement: Dynamic Strikethrough & Graying Engine CSS classes */
-        .record-inactive { opacity: 0.45; text-decoration: line-through #64748b 1.5px; background-color: #f1f5f9/30 !important; color: #64748b !important; }
+        /* 🚨 Core Requirement: Inactive Row Strikethrough Engine */
+        .record-inactive { opacity: 0.45; text-decoration: line-through #64748b 1.5px; background-color: #f1f5f9 !important; color: #64748b !important; }
         .record-inactive td, .record-inactive strong, .record-inactive span { color: #64748b !important; }
         
-        /* Elder-Friendly Spacious Mobile View Cards */
-        .mobile-card { display: none; padding: 1.25rem; border-bottom: 1px solid #e2e8f0; background: white; position: relative; }
-        .mobile-card strong { font-size: 1.15rem; }
-        .mobile-edit-pos { position: absolute; top: 1.25rem; right: 1.25rem; }
-        .details-box { background: #f8fafc; padding: 0.75rem; border-radius: 6px; margin-top: 0.75rem; font-size: 0.75rem; color: #475569; line-height: 1.4; }
+        /* Elder-Friendly Spacious Mobile Card View */
+        .mobile-card { display: none; padding: 1.25rem; border-bottom: 1px solid #e2e8f0; background: white; position: relative; cursor: pointer; }
+        .mobile-card-header { padding-right: 3.5rem; }
+        .mobile-card-header strong { font-size: 1.15rem; color: #0f172a; display: block; }
+        .mobile-badge-pos { position: absolute; top: 1.25rem; right: 1.25rem; text-align: right; }
+        
+        /* Mobile Smooth Accordion Drawer Content */
+        .mobile-expand-details { display: none; background: #f8fafc; padding: 1rem; border-radius: 8px; margin-top: 0.75rem; font-size: 0.8rem; color: #475569; line-height: 1.5; border: 1px dashed #cbd5e1; }
+        .mobile-expand-details.open { display: block; }
+        
+        .pill { padding: 0.125rem 0.5rem; font-weight: 600; border-radius: 9999px; font-size: 0.65rem; display: inline-block; }
+        .pill-completed { background-color: #d1fae5; color: #065f46; }
+        .pill-overdue { background-color: #fee2e2; color: #991b1b; }
         
         @media (max-width: 1023px) { 
             .desktop-table { display: none; } 
             .mobile-card { display: block; } 
         }
         
-        .floating-add-btn { display: none; position: fixed; bottom: 1.25rem; right: 1.25rem; background-color: #0f172a; color: white; border: none; padding: 1rem 1.75rem; font-weight: 700; border-radius: 50px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.3); font-size: 0.85rem; cursor: pointer; z-index: 80; }
-        @media (max-width: 1023px) { .floating-add-btn { display: block; } }
+        /* Dual Floating Setup at Screen Base */
+        .button-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); padding: 0.75rem 1rem; display: flex; justify-content: center; gap: 1rem; z-index: 80; border-top: 1px solid #e2e8f0; }
+        .bar-btn { flex: 1; max-width: 200px; border: none; padding: 0.75rem; font-weight: 700; border-radius: 8px; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; text-align: center; }
+        .btn-add { background-color: #0f172a; color: white; }
+        .btn-refresh { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
     </style>
 </head>
 <body>
@@ -83,15 +102,15 @@
     </nav>
 
     <main>
-        <!-- Dynamic Edit Input Panel Container -->
+        <!-- Data Entry & Edit Shared Modal Form Drawer -->
         <section id="form-drawer" class="panel">
             <button type="button" class="drawer-close-btn" onclick="toggleFormDrawer(false)">✕</button>
-            <h2 class="panel-title">Edit Client Record</h2>
-            <p class="panel-desc">Update financial entries and tracking statuses securely.</p>
+            <h2 id="form-title" class="panel-title">Add New Record</h2>
+            <p id="form-desc" class="panel-desc">Saves financial entry tracking values back into your main spreadsheet matrix.</p>
             
             <form id="ledger-form" onsubmit="handleFormSubmission(event)">
                 <div class="grid-2">
-                    <div class="form-group"><label>Client Name</label><input type="text" id="form-client" required class="form-control"></div>
+                    <div class="form-group"><label>Client Name</label><input type="text" id="form-client" class="form-control"></div>
                     <div class="form-group"><label>Phone Num</label><input type="text" id="form-phone" class="form-control"></div>
                 </div>
                 <div class="grid-2">
@@ -99,9 +118,9 @@
                     <div class="form-group"><label>Total Interest (₹)</label><input type="number" id="form-interest" class="form-control"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label>Issue Date</label><input type="date" id="form-date" required class="form-control"></div>
+                    <div class="form-group"><label>Issue Date</label><input type="date" id="form-date" class="form-control"></div>
                     <div class="form-group">
-                        <label>Account Status</label>
+                        <label>status</label>
                         <select id="form-status" class="form-control">
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
@@ -109,43 +128,48 @@
                     </div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label>Owner</label><input type="text" id="form-owner" class="form-control"></div>
-                    <div class="form-group"><label>Co-Owner</label><input type="text" id="form-coowner" class="form-control"></div>
+                    <div class="form-group"><label>owner</label><input type="text" id="form-owner" class="form-control"></div>
+                    <div class="form-group"><label>co-owner</label><input type="text" id="form-coowner" class="form-control"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label>Co-Owner Amount (₹)</label><input type="number" id="form-coamount" class="form-control"></div>
-                    <div class="form-group"><label>Co-Owner Interest (₹)</label><input type="number" id="form-cointerest" class="form-control"></div>
+                    <div class="form-group"><label>co-owner amount (₹)</label><input type="number" id="form-coamount" class="form-control"></div>
+                    <div class="form-group"><label>co-owner interest (₹)</label><input type="number" id="form-cointerest" class="form-control"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label>Payout Type</label><input type="text" id="form-payout" class="form-control"></div>
-                    <div class="form-group"><label>Interest Rate (%)</label><input type="number" step="0.01" id="form-rate" class="form-control"></div>
+                    <div class="form-group"><label>payout type</label><input type="text" id="form-payout" class="form-control"></div>
+                    <div class="form-group"><label>interest rate (%)</label><input type="number" step="0.01" id="form-rate" class="form-control"></div>
                 </div>
                 <div class="grid-2">
                     <div class="form-group"><label>Location</label><input type="text" id="form-location" class="form-control"></div>
                     <div class="form-group"><label>Department</label><input type="text" id="form-dept" class="form-control"></div>
                 </div>
+                <div class="grid-2">
+                    <div class="form-group"><label>Referal</label><input type="text" id="form-referral" class="form-control"></div>
+                    <div class="form-group"><label>Dealt by</label><input type="text" id="form-dealtby" class="form-control"></div>
+                </div>
                 <div class="form-group"><label>Notes / Remarks</label><textarea id="form-notes" rows="2" class="form-control"></textarea></div>
-                <button type="submit" id="submit-btn" class="submit-btn">Update Entry</button>
+                <button type="submit" id="submit-btn" class="submit-btn">Save Entry</button>
             </form>
         </section>
 
-        <!-- Aggregated Active Financial Status Metrics -->
+        <!-- Dynamic Group Total Metrics Cards (Renamed to Total) -->
         <section class="metrics-grid">
-            <div class="metric-card"><p class="metric-label">Active Capital</p><h3 id="metric-amount" class="metric-val">₹0.00</h3></div>
-            <div class="metric-card"><p class="metric-label">Active Interest</p><h3 id="metric-interest" class="metric-val" style="color: #059669;">₹0.00</h3></div>
+            <div class="metric-card"><p class="metric-label">Total Capital</p><h3 id="metric-amount" class="metric-val">₹0</h3></div>
+            <div class="metric-card"><p class="metric-label">Total Interest</p><h3 id="metric-interest" class="metric-val" style="color: #059669;">₹0</h3></div>
+            <div class="metric-card"><p class="metric-label">Total Clients</p><h3 id="metric-clients" class="metric-val" style="color: #2563eb;">0</h3></div>
         </section>
 
-        <!-- Global Multidimensional Input Filter Box -->
+        <!-- Global Multi-Column Filter Field Block -->
         <section class="search-container">
             <input type="text" id="search-input" placeholder="Search anything (Name, Phone, Location, Notes, Referral, Status)..." class="form-control" style="padding: 0.75rem; font-size: 0.9rem;">
         </section>
 
-        <!-- Dynamic Output Matrix Container -->
+        <!-- Ledger Master Matrix Views Area -->
         <section class="table-container">
             <table class="desktop-table">
                 <thead>
                     <tr>
-                        <th>Client Detail</th>
+                        <th>Client Details</th>
                         <th>Location</th>
                         <th>Issue Date</th>
                         <th class="text-right">Total Amount</th>
@@ -160,15 +184,20 @@
         </section>
     </main>
 
-    <button class="floating-add-btn" style="display:none;" id="mobile-drawer-trigger" onclick="toggleFormDrawer(true)">📋 Open Form</button>
+    <!-- Bottom Actions Control Bar for Mobile View Screens -->
+    <div class="button-bar">
+        <button class="bar-btn btn-refresh" onclick="reloadDashboardData()">🔄 Refresh</button>
+        <button class="bar-btn btn-add" onclick="openCreateDrawer()">➕ Add New</button>
+    </div>
 
     <script>
         // =========================================================================
         // PASTE YOUR BRAND NEW WEB APP URL LINK RIGHT HERE EXACTLY:
-        const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbxzjqkfqKIw4srHD_zykF9Pw6V9phlyRfKSgGmT6PZGe-jJGI8iNfDCXPRuF4x4DVdZsg/exec';
+        const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbwV3BKEGFCHXv6TCJ2IvcNWnSMbETQjzdXCD5zPXNMbN4HWYAYCB7DqXoI2CTE67yWHpg/exec';
         // =========================================================================
 
         let dataStore = [];
+        let isEditMode = false;
         let originalIdentityRef = {}; 
 
         function toggleFormDrawer(open) {
@@ -178,32 +207,64 @@
             else { drawer.classList.remove('open'); overlay.classList.remove('open'); }
         }
 
-        function initiateRowEdit(index) {
-            const row = dataStore[index];
-            originalIdentityRef = { client: row["Client"], date: row["Issue_date"] };
+        function openCreateDrawer() {
+            isEditMode = false;
+            document.getElementById('ledger-form').reset();
+            document.getElementById('form-title').innerText = "Add New Record";
+            document.getElementById('form-desc').innerText = "Saves financial entry tracking values back into your main spreadsheet matrix.";
+            document.getElementById('submit-btn').innerText = "Save Entry";
+            toggleFormDrawer(true);
+        }
 
-            // Prefill your 15 input fields safely matching exact capitalization keys
+        function initiateRowEdit(index, event) {
+            if(event) event.stopPropagation(); // Stops the accordion row expand code from running
+            isEditMode = true;
+            
+            const row = dataStore[index];
+            originalIdentityRef = { client: row["Client"], uid: row["RowUID"] };
+
+            // Prefill inputs based on matching column configuration tags
             document.getElementById('form-client').value = row["Client"] || "";
             document.getElementById('form-phone').value = row["Phone Num"] || "";
             document.getElementById('form-date').value = row["Issue_date"] || "";
-            document.getElementById('form-amount').value = row["Total Amount"] || 0;
-            document.getElementById('form-interest').value = row["total interest"] || 0;
+            document.getElementById('form-amount').value = row["Total Amount"] || "";
+            document.getElementById('form-interest').value = row["total interest"] || "";
             document.getElementById('form-owner').value = row["owner"] || "";
             document.getElementById('form-coowner').value = row["co-owner"] || "";
-            document.getElementById('form-coamount').value = row["co-owner amount"] || 0;
-            document.getElementById('form-cointerest').value = row["co-owner interest"] || 0;
+            document.getElementById('form-coamount').value = row["co-owner amount"] || "";
+            document.getElementById('form-cointerest').value = row["co-owner interest"] || "";
             document.getElementById('form-payout').value = row["payout type"] || "";
-            document.getElementById('form-rate').value = row["interest rate"] || 0;
+            document.getElementById('form-rate').value = row["interest rate"] || "";
             document.getElementById('form-location').value = row["Location"] || "";
             document.getElementById('form-dept').value = row["Department"] || "";
+            document.getElementById('form-referral').value = row["Referal"] || "";
+            document.getElementById('form-dealtby').value = row["Dealt by"] || "";
             document.getElementById('form-notes').value = row["Notes"] || "";
-            document.getElementById('form-status').value = (row["Status"] || "Active").trim();
+            document.getElementById('form-status').value = row["status"] || "Active";
+
+            document.getElementById('form-title').innerText = "Edit Client Record";
+            document.getElementById('form-desc').innerText = "Update financial entries and tracking statuses securely.";
+            document.getElementById('submit-btn').innerText = "Update Entry";
 
             toggleFormDrawer(true);
         }
 
+        function toggleRowAccordion(id, type) {
+            const el = document.getElementById(`${type}-details-${id}`);
+            if(el) {
+                const isOpen = el.classList.contains('open');
+                // Close any open sheets first
+                document.querySelectorAll('.expandable-detail-row, .mobile-expand-details').forEach(d => d.classList.remove('open'));
+                if(!isOpen) el.classList.add('open');
+            }
+        }
+
         function reloadDashboardData() {
             if(GOOGLE_API_URL.includes('PASTE_YOUR_COPIED')) return;
+            const statusEl = document.getElementById('sync-status');
+            statusEl.innerText = "Syncing...";
+            statusEl.style.backgroundColor = "#4f46e5";
+
             const oldScript = document.getElementById('jsonp-script');
             if (oldScript) oldScript.remove();
 
@@ -228,11 +289,12 @@
         async function handleFormSubmission(event) {
             event.preventDefault();
             const btn = document.getElementById('submit-btn');
-            btn.disabled = true; btn.innerText = "SAVING CHANGES...";
+            btn.disabled = true; btn.innerText = "PROCESSING CLOUD ROW SAVE...";
 
             const payload = {
-                oldClient: originalIdentityRef.client,
-                oldDate: originalIdentityRef.date,
+                action: isEditMode ? "edit" : "insert",
+                oldClient: isEditMode ? originalIdentityRef.client : "",
+                oldUID: isEditMode ? originalIdentityRef.uid : "",
                 Client: document.getElementById('form-client').value.trim(),
                 PhoneNum: document.getElementById('form-phone').value.trim(),
                 IssueDate: document.getElementById('form-date').value,
@@ -246,21 +308,25 @@
                 InterestRate: document.getElementById('form-rate').value || "0",
                 Location: document.getElementById('form-location').value.trim(),
                 Department: document.getElementById('form-dept').value.trim(),
+                Referral: document.getElementById('form-referral').value.trim(),
+                DealtBy: document.getElementById('form-dealtby').value.trim(),
                 Notes: document.getElementById('form-notes').value.trim(),
-                Status: document.getElementById('form-status').value
+                status: document.getElementById('form-status').value
             };
 
             try {
                 await fetch(GOOGLE_API_URL, { method: 'POST', body: JSON.stringify(payload) });
-                alert("Spreadsheet entry updated successfully!");
+                alert(isEditMode ? "Record successfully saved!" : "New entry added successfully!");
+                document.getElementById('ledger-form').reset();
                 toggleFormDrawer(false);
-                setTimeout(reloadDashboardData, 1500);
+                setTimeout(reloadDashboardData, 1000); // 1 second reload
             } catch (error) {
-                alert("Spreadsheet entry updated successfully!");
+                alert(isEditMode ? "Record successfully saved!" : "New entry added successfully!");
+                document.getElementById('ledger-form').reset();
                 toggleFormDrawer(false);
-                setTimeout(reloadDashboardData, 1500);
+                setTimeout(reloadDashboardData, 1000);
             } finally {
-                btn.disabled = false; btn.innerText = "Update Entry";
+                btn.disabled = false; btn.innerText = isEditMode ? "Update Entry" : "Save Entry";
             }
         }
 
@@ -269,70 +335,93 @@
             const mList = document.getElementById('mobile-list');
             tbody.innerHTML = ""; mList.innerHTML = "";
             
-            let activeAmountSum = 0, activeInterestSum = 0;
+            let totalAmountSum = 0, totalInterestSum = 0;
 
             data.forEach((row, idx) => {
                 const amount = parseFloat(row["Total Amount"]) || 0;
                 const interest = parseFloat(row["total interest"]) || 0;
-                const status = (row["Status"] || "Active").trim();
-                const isInactive = status.toLowerCase() === "inactive";
+                const statusStr = (row["status"] || "Active").trim();
+                const isInactive = statusStr.toLowerCase() === "inactive";
 
-                // Add to active counts only if account status isn't marked inactive
-                if (!isInactive) { activeAmountSum += amount; activeInterestSum += interest; }
+                totalAmountSum += amount; 
+                totalInterestSum += interest;
 
-                // Determine dynamic row visual strike-through modifier string class
                 const strikeClass = isInactive ? "record-inactive" : "";
 
-                // 1. Build Desktop View Table
+                // 1. Desktop Output Grid (Collapsible)
                 tbody.innerHTML += `
-                    <tr class="${strikeClass}">
-                        <td><strong style="font-size:0.9rem; color:#0f172a;">${row["Client"]}</strong><br><small style="color:#64748b;">Mob: ${row["Phone Num"] || '-'}</small></td>
+                    <tr class="desktop-row-clickable ${strikeClass}" onclick="toggleRowAccordion(${idx}, 'desktop')">
+                        <td><strong style="font-size:0.95rem; color:#0f172a;">${row["Client"] || '-'}</strong><br><small style="color:#64748b;">Mob: ${row["Phone Num"] || '-'}</small></td>
                         <td>${row["Location"] || '-'}</td>
                         <td>${row["Issue_date"] || '-'}</td>
                         <td class="text-right font-mono">${formatRupee(amount)}</td>
                         <td class="text-right font-mono" style="color:#059669;">${formatRupee(interest)}</td>
-                        <td class="text-center"><span class="pill ${isInactive ? 'pill-overdue':'pill-completed'}">${status}</span></td>
-                        <td class="text-center"><a class="edit-link" onclick="initiateRowEdit(${idx})">Edit</a></td>
+                        <td class="text-center"><span class="pill ${isInactive ? 'pill-overdue':'pill-completed'}">${statusStr}</span></td>
+                        <td class="text-center"><a class="action-link edit-link" onclick="initiateRowEdit(${idx}, event)">Edit</a></td>
                     </tr>
-                    <tr class="${strikeClass}"><td colspan="7" class="sub-row-details">
-                        <strong>Mgmt:</strong> Owner: ${row["owner"] || '-'} | Co-Owner: ${row["co-owner"] || '-'} (${formatRupee(row["co-owner amount"])}) | Rate: ${row["interest rate"] || 0}% | <strong>Notes:</strong> ${row["Notes"] || '-'}
+                    <tr id="desktop-details-${idx}" class="expandable-detail-row"><td colspan="7">
+                        <div class="details-wrapper">
+                            <div>
+                                <strong>Management Breakup:</strong><br>
+                                • Main Owner: ${row["owner"] || '-'}<br>
+                                • Co-Owner: ${row["co-owner"] || '-'} (${formatRupee(row["co-owner amount"])})<br>
+                                • Co-Owner Interest: ${formatRupee(row["co-owner interest"])}
+                            </div>
+                            <div>
+                                <strong>Deal Parameters:</strong><br>
+                                • Interest Rate: ${row["interest rate"] || 0}%<br>
+                                • Payout Type: ${row["payout type"] || '-'} <br>
+                                • Department: ${row["Department"] || '-'}
+                            </div>
+                            <div>
+                                <strong>Audit & Logs:</strong><br>
+                                • Referral: ${row["Referal"] || '-'} <br>
+                                • Dealt By: ${row["Dealt by"] || '-'} <br>
+                                • <strong>Notes:</strong> ${row["Notes"] || '-'}
+                            </div>
+                        </div>
                     </td></tr>`;
 
-                // 2. Build Elder-Friendly Mobile Card View
+                // 2. Mobile Output Grid (Collapsible)
                 mList.innerHTML += `
-                    <div class="mobile-card ${strikeClass}">
-                        <div>
-                            <strong>${row["Client"]}</strong>
+                    <div class="mobile-card ${strikeClass}" onclick="toggleRowAccordion(${idx}, 'mobile')">
+                        <div class="mobile-card-header">
+                            <strong>${row["Client"] || '-'}</strong>
                             <div style="font-size:0.75rem; color:#64748b; margin-top:0.25rem;">📍 ${row["Location"] || '-'} | 📅 ${row["Issue_date"] || '-'}</div>
                         </div>
-                        <div class="mobile-edit-pos text-right">
-                            <span class="pill ${isInactive ? 'pill-overdue':'pill-completed'}" style="margin-bottom:0.4rem; display:block;">${status}</span>
-                            <a class="edit-link" onclick="initiateRowEdit(${idx})">Edit</a>
+                        <div class="mobile-badge-pos">
+                            <span class="pill ${isInactive ? 'pill-overdue':'pill-completed'}" style="margin-bottom:0.4rem; display:block;">${statusStr}</span>
+                            <a class="action-link edit-link" onclick="initiateRowEdit(${idx}, event)">Edit</a>
                         </div>
                         <div style="display:grid; grid-template-columns:1fr 1fr; margin-top:0.75rem; font-family:monospace; font-size:0.9rem;">
                             <div><span style="font-family:sans-serif; font-size:0.65rem; color:#64748b; display:block; text-transform:uppercase;">Total Capital</span>${formatRupee(amount)}</div>
                             <div class="text-right"><span style="font-family:sans-serif; font-size:0.65rem; color:#64748b; display:block; text-transform:uppercase;">Interest</span><span style="color:#059669;">${formatRupee(interest)}</span></div>
                         </div>
-                        <div class="details-box">
-                            <strong>Owner:</strong> ${row["owner"] || '-'} | <strong>Co-Owner:</strong> ${row["co-owner"] || '-'}<br>
-                            <strong>Rate:</strong> ${row["interest rate"] || 0}% | <strong>Payout:</strong> ${row["payout type"] || '-'}<br>
-                            <strong>Notes:</strong> ${row["Notes"] || '-'}
+                        
+                        <div id="mobile-details-${idx}" class="mobile-expand-details">
+                            <strong>• Owner:</strong> ${row["owner"] || '-'}<br>
+                            <strong>• Co-Owner:</strong> ${row["co-owner"] || '-'} (${formatRupee(row["co-owner amount"])})<br>
+                            <strong>• Co-Owner Interest:</strong> ${formatRupee(row["co-owner interest"])}<br>
+                            <strong>• Interest Rate:</strong> ${row["interest rate"] || 0}%<br>
+                            <strong>• Payout Type:</strong> ${row["payout type"] || '-'}<br>
+                            <strong>• Department:</strong> ${row["Department"] || '-'} <br>
+                            <strong>• Referral:</strong> ${row["Referal"] || '-'}<br>
+                            <strong>• Dealt By:</strong> ${row["Dealt by"] || '-'}<br>
+                            <strong style="margin-top:0.25rem; display:block;">• Notes:</strong> ${row["Notes"] || '-'}
                         </div>
                     </div>`;
             });
 
-            document.getElementById('metric-amount').innerText = formatRupee(activeAmountSum);
-            document.getElementById('metric-interest').innerText = formatRupee(activeInterestSum);
-            
-            // Activate Mobile Trigger Button visibility rules dynamically
-            if(window.innerWidth < 1024) document.getElementById('mobile-drawer-trigger').style.display = 'block';
+            document.getElementById('metric-amount').innerText = formatRupee(totalAmountSum);
+            document.getElementById('metric-interest').innerText = formatRupee(totalInterestSum);
+            document.getElementById('metric-clients').innerText = data.length;
         }
 
         function formatRupee(val) {
             return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
         }
 
-        // Global Multidimensional Filter Box matching terms across ALL 15 sheet parameters
+        // Global Search Filter Engine over all 17 Column Parameters
         document.getElementById('search-input').addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase().trim();
             const matchingRows = dataStore.filter(row => {
