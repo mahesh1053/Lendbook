@@ -3,159 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Ledger Dashboard</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://tailwindcss.com"></script>
-    <!-- FontAwesome CDN for clean interface icons -->
-    <link rel="stylesheet" href="https://cloudflare.com" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <title>Interactive Shop Ledger</title>
+    <!-- Embedded styling engine to guarantee the dashboard looks beautiful instantly -->
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f9fafb; margin: 0; color: #1f2937; padding-bottom: 2rem; }
+        nav { background-color: #4f46e5; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); sticky: top; z-index: 50; }
+        nav h1 { margin: 0; font-size: 1.125rem; font-weight: 700; letter-spacing: 0.05em; }
+        .status-badge { font-size: 0.75rem; background-color: #4338ca; padding: 0.25rem 0.75rem; rounded-radius: 6px; border: 1px solid #6366f1; border-radius: 6px; font-weight: 500; }
+        main { max-w: 1280px; margin: 0 auto; padding: 1rem; display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        @media (min-width: 1024px) { main { grid-template-columns: 1fr 2fr; } }
+        .panel { background: white; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: fit-content; }
+        .panel-title { font-size: 1rem; font-weight: 700; margin: 0 0 0.25rem 0; color: #111827; }
+        .panel-desc { font-size: 0.75rem; color: #9ca3af; margin: 0 0 1rem 0; }
+        .form-group { margin-bottom: 0.875rem; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem; }
+        .form-control { w-width: 100%; width: -webkit-fill-available; width: fill-available; width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; background-color: #f9fafb; font-size: 0.75rem; }
+        .form-control:focus { outline: none; border-color: #4f46e5; background: white; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .submit-btn { width: 100%; padding: 0.625rem; background-color: #4f46e5; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer; font-size: 0.75rem; }
+        .submit-btn:hover { background-color: #4338ca; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+        .metric-card { background: white; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; text-align: center; }
+        .metric-label { font-size: 0.65rem; color: #9ca3af; font-weight: 700; text-transform: uppercase; margin: 0; }
+        .metric-val { font-size: 1.125rem; font-weight: 700; margin: 0.25rem 0 0 0; }
+        .search-container { background: white; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; margin-bottom: 1.5rem; }
+        .table-container { background: white; border-radius: 0.75rem; border: 1px solid #e5e7eb; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.75rem; }
+        th { background-color: #f9fafb; padding: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; border-b: 1px solid #e5e7eb; }
+        td { padding: 0.75rem; border-bottom: 1px solid #f3f4f6; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .font-mono { font-family: monospace; }
+        .pill { padding: 0.125rem 0.5rem; font-weight: 600; border-radius: 9999px; font-size: 0.7rem; }
+        .pill-completed { background-color: #d1fae5; color: #065f46; }
+        .pill-pending { background-color: #fef3c7; color: #92400e; }
+        .pill-overdue { background-color: #fee2e2; color: #991b1b; }
+        .pill-unknown { background-color: #f3f4f6; color: #374151; }
+        .mobile-card { display: none; padding: 0.875rem; border-bottom: 1px solid #f3f4f6; background: white; }
+        @media (max-width: 768px) { 
+            .desktop-table { display: none; } 
+            .mobile-card { display: block; } 
+        }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans text-gray-800 antialiased">
+<body>
 
-    <!-- Top Sticky Navigation Bar -->
-    <nav class="bg-indigo-600 text-white p-4 flex justify-between items-center shadow-md sticky top-0 z-50">
-        <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-chart-pie text-xl text-indigo-200"></i>
-            <h1 class="text-lg font-bold tracking-wide">Shop Ledger System</h1>
-        </div>
-        <span id="sync-status" class="text-xs bg-indigo-700 px-3 py-1 rounded-md font-medium border border-indigo-500 transition-all duration-300">
-            Connecting...
-        </span>
+    <!-- Navbar Section -->
+    <nav>
+        <h1>Live Shop Ledger</h1>
+        <span id="sync-status" class="status-badge">Connecting...</span>
     </nav>
 
-    <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
-
-        <!-- Top Overview Metrics Grid -->
-        <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Given Metric -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Given</p>
-                <h3 id="metric-given" class="text-xl font-bold text-gray-900 mt-1">$0.00</h3>
-            </div>
-            <!-- Received Metric -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Received</p>
-                <h3 id="metric-received" class="text-xl font-bold text-emerald-600 mt-1">$0.00</h3>
-            </div>
-            <!-- Pending Balance Metric -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Pending</p>
-                <h3 id="metric-pending" class="text-xl font-bold text-amber-600 mt-1">$0.00</h3>
-            </div>
-            <!-- Unique Shops Count -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Shops</p>
-                <h3 id="metric-shops" class="text-xl font-bold text-purple-900 mt-1">0</h3>
-            </div>
+    <!-- Main App Split View Layout -->
+    <main>
+        
+        <!-- Left Side Panel: Form to ADD entries to Sheet -->
+        <section class="panel">
+            <h2 class="panel-title">Add New Record</h2>
+            <p class="panel-desc">Inserts details directly into your tracking spreadsheet.</p>
+            
+            <form id="ledger-form" onsubmit="handleFormSubmission(event)">
+                <div class="form-group">
+                    <label>Shop Name</label>
+                    <input type="text" id="form-shop-name" required class="form-control">
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Amount Given ($)</label>
+                        <input type="number" step="0.01" id="form-amount-given" value="0" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount Received ($)</label>
+                        <input type="number" step="0.01" id="form-amount-received" value="0" class="form-control">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Transaction Date</label>
+                        <input type="date" id="form-date" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="form-status" class="form-control">
+                            <option value="Pending">Pending</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Partial">Partial</option>
+                            <option value="Overdue">Overdue</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notes / Description</label>
+                    <textarea id="form-notes" rows="2" class="form-control"></textarea>
+                </div>
+                <button type="submit" id="submit-btn" class="submit-btn">Save Entry</button>
+            </form>
         </section>
 
-        <!-- Search Bar -->
-        <section class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-center">
-            <div class="relative w-full">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                </span>
-                <input type="text" id="search-input" placeholder="Search by shop name..." 
-                    class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+        <!-- Right Side Panel: Live Visual Dashboard Visualizer -->
+        <section>
+            <!-- Aggregated Totals Row -->
+            <div class="metrics-grid">
+                <div class="metric-card"><p class="metric-label">Given</p><h3 id="metric-given" class="metric-val" style="color: #111827;">$0.00</h3></div>
+                <div class="metric-card"><p class="metric-label">Received</p><h3 id="metric-received" class="metric-val" style="color: #059669;">$0.00</h3></div>
+                <div class="metric-card"><p class="metric-label">Pending</p><h3 id="metric-pending" class="metric-val" style="color: #d97706;">$0.00</h3></div>
             </div>
-        </section>
 
-        <!-- Ledger Entries Section -->
-        <section class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <!-- Desktop Layout Table (visible on screens larger than mobile) -->
-            <div class="hidden md:block overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+            <!-- Shop Search Input Box -->
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search data rows by shop name..." class="form-control" style="font-size: 0.85rem;">
+            </div>
+
+            <!-- Live Ledger Entries Area -->
+            <div class="table-container">
+                <!-- Large Desktop Screens View Layout -->
+                <table class="desktop-table">
                     <thead>
-                        <tr class="bg-gray-50 border-b border-gray-100 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                            <th class="p-4">Shop Name</th>
-                            <th class="p-4">Date</th>
-                            <th class="p-4 text-right">Amount Given</th>
-                            <th class="p-4 text-right">Amount Received</th>
-                            <th class="p-4 text-right">Pending Balance</th>
-                            <th class="p-4 text-center">Status</th>
-                            <th class="p-4">Notes</th>
+                        <tr>
+                            <th>Shop</th>
+                            <th>Date</th>
+                            <th class="text-right">Given</th>
+                            <th class="text-right">Received</th>
+                            <th class="text-right">Pending</th>
+                            <th class="text-center">Status</th>
                         </tr>
                     </thead>
-                    <tbody id="table-body" class="divide-y divide-gray-100 text-sm text-gray-700">
-                        <tr>
-                            <td colspan="7" class="p-8 text-center text-gray-400">
-                                <i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading dashboard modules...
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tbody id="table-body" style="color: #374151;"></tbody>
                 </table>
-            </div>
-
-            <!-- Mobile Layout Container (visible on phones) -->
-            <div id="mobile-list" class="block md:hidden divide-y divide-gray-100">
-                <div class="p-8 text-center text-gray-400 text-sm">
-                    <i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading dashboard modules...
-                </div>
+                
+                <!-- Tiny Mobile Phone Screen Card View Layout -->
+                <div id="mobile-list"></div>
             </div>
         </section>
     </main>
 
     <script>
-        // GOOGLE SHEET SYNC CONFIGURATION
+        // =========================================================================
+        // CONFIGURATION PARAMETERS (CHANGE THESE VALUE CODES ONLY)
+        // =========================================================================
+        
+        // 1. Paste your published Google Sheet CSV link string inside these single quotes:
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSdlco1RbLt9TnSPpATWQ1ZdTz2p1Uk3zSM3MVgekyoMOSn2gcwQRAAYDEJQ9yWJqtorfLbxTWNEmyv/pub?output=csv';
+        
+        // 2. Paste your Google Apps Script Deployment Execution API URL link string here:
+        const WRITE_API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
 
-        let ledgerRecords = [];
+        // =========================================================================
 
-        async function fetchSheetData() {
+        let dataStore = [];
+
+        async function reloadDashboardData() {
             const statusEl = document.getElementById('sync-status');
             try {
-                // cache-busting timestamp string appended to bypass aggressive mobile CDNs
-                const cleanUrl = SHEET_CSV_URL + '&t=' + new Date().getTime();
-                
-                const response = await fetch(cleanUrl);
-                if (!response.ok) throw new Error("Failed to read public data link streams.");
-                
-                const textData = await response.text();
-                ledgerRecords = parseCSV(textData);
-                
-                renderDashboard(ledgerRecords);
+                const response = await fetch(SHEET_CSV_URL + '&t=' + new Date().getTime());
+                if(!response.ok) throw new Error("CORS or validation error.");
+                const text = await response.text();
+                dataStore = parseCSV(text);
+                renderUIElements(dataStore);
                 statusEl.innerText = "Connected";
-                statusEl.className = "text-xs bg-emerald-500 text-white px-3 py-1 rounded-md font-medium shadow-sm";
+                statusEl.style.backgroundColor = "#10b981";
+            } catch (err) {
+                console.error(err);
+                statusEl.innerText = "Sync Failed";
+                statusEl.style.backgroundColor = "#ef4444";
+                
+                const errHtml = `<div style="padding: 2rem; text-align: center; color: #ef4444; font-weight: 600;">Connection Error: Could not read data. Verify your SHEET_CSV_URL link script rules.</div>`;
+                document.getElementById('table-body').innerHTML = `<tr><td colspan="6">${errHtml}</td></tr>`;
+                document.getElementById('mobile-list').innerHTML = errHtml;
+            }
+        }
+
+        async function handleFormSubmission(event) {
+            event.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            
+            if(WRITE_API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+                alert("Please complete Step 2 first! Paste your Google Apps Script Web App execution link into line 125 of this index.html file.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Saving entry row...";
+
+            const payload = {
+                shopName: document.getElementById('form-shop-name').value.trim(),
+                amountGiven: document.getElementById('form-amount-given').value || "0",
+                amountReceived: document.getElementById('form-amount-received').value || "0",
+                date: document.getElementById('form-date').value,
+                status: document.getElementById('form-status').value,
+                notes: document.getElementById('form-notes').value.trim()
+            };
+
+            try {
+                await fetch(WRITE_API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                alert("Entry sent successfully! Reloading frontend dashboard rows layout...");
+                document.getElementById('ledger-form').reset();
+                document.getElementById('form-date').valueAsDate = new Date();
+                setTimeout(reloadDashboardData, 2000);
             } catch (error) {
                 console.error(error);
-                statusEl.innerText = "Sync Failed";
-                statusEl.className = "text-xs bg-rose-500 text-white px-3 py-1 rounded-md font-medium shadow-sm";
-                
-                const errorMarkup = `
-                    <div class="p-8 text-center text-rose-500 text-xs font-semibold">
-                        <i class="fa-solid fa-triangle-exclamation text-xl mb-1 block"></i>
-                        Unable to connect to Google Sheets. Verify publication output mappings.
-                    </div>`;
-                document.getElementById('table-body').innerHTML = `<tr><td colspan="7">${errorMarkup}</td></tr>`;
-                document.getElementById('mobile-list').innerHTML = errorMarkup;
+                alert("Network communication execution failure.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Save Entry";
             }
         }
 
         function parseCSV(csvText) {
             const lines = csvText.split(/\r?\n/);
             if (lines.length < 2) return [];
-            const headers = lines.split(',').map(h => h.trim().replace(/"/g, ''));
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
             return lines.slice(1).map(line => {
                 const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
-                const cleanValues = matches.map(v => v.trim().replace(/^"|"$|^'|'$/g, ''));
-                let item = {};
-                headers.forEach((header, index) => { item[header] = cleanValues[index] || ""; });
-                return item;
+                const values = matches.map(v => v.trim().replace(/^"|"$|^'|'$/g, ''));
+                let obj = {};
+                headers.forEach((header, index) => { obj[header] = values[index] || ""; });
+                return obj;
             }).filter(item => item["Shop Name"]);
         }
 
-        function renderDashboard(data) {
+        function renderUIElements(data) {
             let givenTotal = 0, receivedTotal = 0;
-            let totalUniqueShops = new Set();
             const tbody = document.getElementById('table-body');
             const mList = document.getElementById('mobile-list');
-            
-            tbody.innerHTML = "";
-            mList.innerHTML = "";
+            tbody.innerHTML = ""; mList.innerHTML = "";
 
             if(data.length === 0) {
-                const emptyHTML = `<div class="p-6 text-center text-gray-400 text-sm">No ledger data matching search filter criteria.</div>`;
-                tbody.innerHTML = `<tr><td colspan="7">${emptyHTML}</td></tr>`;
+                const emptyHTML = `<div style="padding: 1.5rem; text-align: center; color: #9ca3af;">No rows match filter parameters.</div>`;
+                tbody.innerHTML = `<tr><td colspan="6">${emptyHTML}</td></tr>`;
                 mList.innerHTML = emptyHTML;
                 return;
             }
@@ -164,71 +245,56 @@
                 const given = parseFloat(row["Amount Given"]) || 0;
                 const received = parseFloat(row["Amount Received"]) || 0;
                 const pending = given - received;
+                givenTotal += given; receivedTotal += received;
 
-                givenTotal += given;
-                receivedTotal += received;
-                if(row["Shop Name"]) totalUniqueShops.add(row["Shop Name"]);
+                let pillClass = "pill pill-unknown";
+                const st = (row["Status"] || "").trim().toLowerCase();
+                if(st === 'paid' || st === 'completed') pillClass = "pill pill-completed";
+                else if(st === 'pending' || st === 'partial') pillClass = "pill pill-pending";
+                else if(st === 'overdue') pillClass = "pill pill-overdue";
 
-                // Dynamic CSS Badge Renderer Engine
-                let statusStyle = "bg-gray-100 text-gray-700";
-                const rowStatus = (row["Status"] || "").trim().toLowerCase();
-                if (rowStatus === 'paid' || rowStatus === 'completed') statusStyle = "bg-emerald-100 text-emerald-800";
-                else if (rowStatus === 'pending' || rowStatus === 'partial') statusStyle = "bg-amber-100 text-amber-800";
-                else if (rowStatus === 'overdue') statusStyle = "bg-rose-100 text-rose-800";
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight: 700; color: #111827;">${row["Shop Name"]}</td>
+                        <td style="color: #6b7280;">${row["Date"] || '-'}</td>
+                        <td class="text-right font-mono">${formatCurrency(given)}</td>
+                        <td class="text-right font-mono" style="color: #059669;">${formatCurrency(received)}</td>
+                        <td class="text-right font-mono" style="font-weight: 700; color: ${pending > 0 ? '#d97706' : '#111827'}">${formatCurrency(pending)}</td>
+                        <td class="text-center"><span class="${pillClass}">${row["Status"] || 'Unknown'}</span></td>
+                    </tr>`;
 
-                // 1. Build Desktop Table UI Matrix Row 
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50/60 border-b border-gray-100 transition-colors";
-                tr.innerHTML = `
-                    <td class="p-4 font-bold text-gray-900">${row["Shop Name"]}</td>
-                    <td class="p-4 text-gray-500 text-xs">${row["Date"] || '-'}</td>
-                    <td class="p-4 text-right font-mono text-xs">${formatCurrency(given)}</td>
-                    <td class="p-4 text-right font-mono text-emerald-600 text-xs">${formatCurrency(received)}</td>
-                    <td class="p-4 text-right font-mono font-bold text-xs ${pending > 0 ? 'text-amber-600' : 'text-gray-900'}">${formatCurrency(pending)}</td>
-                    <td class="p-4 text-center"><span class="px-2.5 py-0.5 text-xs font-semibold rounded-full ${statusStyle}">${row["Status"] || 'Unknown'}</span></td>
-                    <td class="p-4 text-gray-400 text-xs max-w-xs truncate" title="${row["Notes"] || ''}">${row["Notes"] || '-'}</td>
-                `;
-                tbody.appendChild(tr);
-
-                // 2. Build Mobile Screen Stack Cards UI Row
-                const card = document.createElement('div');
-                card.className = "p-4 space-y-3 bg-white";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="font-bold text-gray-900 text-base">${row["Shop Name"]}</h4>
-                            <span class="text-[11px] text-gray-400"><i class="fa-regular fa-calendar mr-1"></i>${row["Date"] || 'No Date Specified'}</span>
+                mList.innerHTML += `
+                    <div class="mobile-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <strong style="font-size: 0.95rem; color: #111827;">${row["Shop Name"]}</strong>
+                            <span class="${pillClass}">${row["Status"] || 'Unknown'}</span>
                         </div>
-                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${statusStyle}">${row["Status"] || 'Unknown'}</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 pt-1 text-center font-mono border-t border-gray-50">
-                        <div class="text-left"><span class="text-[9px] uppercase tracking-tight text-gray-400 block font-sans">Given</span><span class="text-xs text-gray-700 font-semibold">${formatCurrency(given)}</span></div>
-                        <div><span class="text-[9px] uppercase tracking-tight text-gray-400 block font-sans">Received</span><span class="text-xs text-emerald-600 font-semibold">${formatCurrency(received)}</span></div>
-                        <div class="text-right"><span class="text-[9px] uppercase tracking-tight text-gray-400 block font-sans">Pending</span><span class="text-xs font-bold ${pending > 0 ? 'text-amber-600' : 'text-gray-900'}">${formatCurrency(pending)}</span></div>
-                    </div>
-                    ${row["Notes"] ? `<p class="text-xs bg-gray-50 text-gray-500 p-2 rounded-lg border border-gray-100 text-left"><span class="text-[9px] uppercase font-semibold text-gray-400 block font-sans tracking-wide">Notes</span>${row["Notes"]}</p>` : ''}
-                `;
-                mList.appendChild(card);
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); font-family: monospace; font-size: 0.75rem;">
+                            <div><span style="color: #9ca3af; display: block; font-family: sans-serif; font-size: 0.6rem; text-transform: uppercase;">Given</span>${formatCurrency(given)}</div>
+                            <div style="text-align: center;"><span style="color: #9ca3af; display: block; font-family: sans-serif; font-size: 0.6rem; text-transform: uppercase;">Recv</span><span style="color: #059669;">${formatCurrency(received)}</span></div>
+                            <div style="text-align: right;"><span style="color: #9ca3af; display: block; font-family: sans-serif; font-size: 0.6rem; text-transform: uppercase;">Pend</span><span style="font-weight:700; color:${pending > 0 ? '#d97706' : '#111827'}">${formatCurrency(pending)}</span></div>
+                        </div>
+                    </div>`;
             });
 
             document.getElementById('metric-given').innerText = formatCurrency(givenTotal);
             document.getElementById('metric-received').innerText = formatCurrency(receivedTotal);
             document.getElementById('metric-pending').innerText = formatCurrency(givenTotal - receivedTotal);
-            document.getElementById('metric-shops').innerText = totalUniqueShops.size;
         }
 
         function formatCurrency(val) {
             return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
         }
 
-        // Search action listener
         document.getElementById('search-input').addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase().trim();
-            const filtered = ledgerRecords.filter(row => (row["Shop Name"] || '').toLowerCase().includes(val));
-            renderDashboard(filtered);
+            renderUIElements(dataStore.filter(row => (row["Shop Name"] || '').toLowerCase().includes(val)));
         });
 
-        window.addEventListener('DOMContentLoaded', fetchSheetData);
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('form-date').valueAsDate = new Date();
+            reloadDashboardData();
+        });
     </script>
 </body>
 </html>
