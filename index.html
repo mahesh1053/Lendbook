@@ -29,7 +29,7 @@
             .drawer-close-btn { float: right; background: #e2e8f0; border: none; border-radius: 50%; width: 30px; height: 30px; font-weight: bold; cursor: pointer; display: block; }
         }
         
-        .drawer-close-btn { display: none; }
+        .drawer-close-btn { float: right; background: #e2e8f0; border: none; border-radius: 50%; width: 30px; height: 30px; font-weight: bold; cursor: pointer; display: block; margin-bottom: 0.5rem; }
         .panel-title { font-size: 1.1rem; font-weight: 700; margin: 0 0 0.25rem 0; color: #0f172a; }
         .panel-desc { font-size: 0.75rem; color: #64748b; margin: 0 0 1rem 0; }
         .form-group { margin-bottom: 0.75rem; }
@@ -101,7 +101,24 @@
     </style>
 </head>
 <body>
+    <!-- 🔐 Password Protection Screen -->
+    <div id="auth-screen" style="position: fixed; inset: 0; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
+         display: flex; align-items: center; justify-content: center; z-index: 9999;">
+        <div style="background: white; padding: 2.5rem; border-radius: 1rem; max-width: 380px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h2 style="margin: 0 0 0.5rem 0; text-align: center; color: #0f172a; font-size: 1.5rem;">🔒 Khata Book</h2>
+            <p style="text-align: center; color: #64748b; font-size: 0.85rem; margin: 0 0 1.5rem 0;">Enter password to access</p>
+            <input type="password" id="auth-password" class="form-control" 
+                   placeholder="Enter password" style="margin-bottom: 0.75rem;"
+                   onkeypress="if(event.key==='Enter') verifyPassword()">
+            <button onclick="verifyPassword()" class="submit-btn" style="margin-top: 0;">🔓 Unlock</button>
+            <p id="auth-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.75rem; text-align: center; display: none; font-weight: 600;">
+                ❌ Incorrect password!
+            </p>
+        </div>
+    </div>
 
+    <!-- Backing dim mask for slider components overlay references -->
+    <div id="overlay-shield" class="drawer-overlay" onclick="toggleFormDrawer(false)"></div>
     <!-- Backing dim mask for slider components overlay references -->
     <div id="overlay-shield" class="drawer-overlay" onclick="toggleFormDrawer(false)"></div>
 
@@ -219,6 +236,28 @@
         // =========================================================================
         const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbzvESczzb2t7Eb0BWOLiuOGRmfZ6brHRbI0WppiYj2RiX5gnQXhV8w17pSl_Jgn58cr8A/exec';
         // =========================================================================
+        // 🔐 PASSWORD PROTECTION
+        const APP_PASSWORD = "2025";  // ⚠️ CHANGE THIS PASSWORD!
+
+        function verifyPassword() {
+            const input = document.getElementById('auth-password').value;
+            const errorMsg = document.getElementById('auth-error');
+            
+            if (input === APP_PASSWORD) {
+                document.getElementById('auth-screen').style.display = 'none';
+                sessionStorage.setItem('khata_authenticated', 'true');
+                errorMsg.style.display = 'none';
+            } else {
+                errorMsg.style.display = 'block';
+                document.getElementById('auth-password').value = '';
+                document.getElementById('auth-password').focus();
+            }
+        }
+
+        // Check authentication on page load
+        if (sessionStorage.getItem('khata_authenticated') === 'true') {
+            document.getElementById('auth-screen').style.display = 'none';
+        }
 
         let dataStore = [];
         let currentLanguage = 'en'; 
